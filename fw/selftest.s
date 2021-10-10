@@ -1,0 +1,144 @@
+.section .text
+.global _start
+_start:
+	li t0, 0x8fffffff
+subs:
+	addi t0,t0,-2000
+	bge t0,zero,subs
+
+testimm:
+    li t0,0x00000001
+    li t0,0x00000002
+    li t0,0x00000004
+    li t0,0x00000008
+    li t0,0x00000010
+    li t0,0x00000020
+    li t0,0x00000040
+    li t0,0x00000080
+    li t0,0x00000100
+    li t0,0x00000200
+    li t0,0x00000400
+
+    #li t0,0x00000800
+
+    li t0,0x00001000
+    li t0,0x00002000
+    li t0,0x00004000
+    li t0,0x00008000
+    li t0,0x00010000
+    li t0,0x00020000
+    li t0,0x00040000
+    li t0,0x00080000
+    li t0,0x00100000
+    li t0,0x00200000
+    li t0,0x00400000
+    li t0,0x00800000
+    li t0,0x01000000
+    li t0,0x02000000
+    li t0,0x04000000
+    li t0,0x08000000
+    li t0,0x10000000
+    li t0,0x20000000
+    li t0,0x40000000
+    li t0,0x80000000
+
+    add x30,x31,x0
+    add x31,x0,x1
+    add x0,x1,x2
+    add x1,x2,x3
+    add x2,x3,x4
+    add x3,x4,x5
+    add x4,x5,x6
+    add x5,x6,x7
+    add x6,x7,x8
+    add x7,x8,x9
+    add x8,x9,x10
+    add x9,x10,x11
+    add x10,x11,x12
+    add x11,x12,x13
+    add x12,x13,x14
+    add x13,x14,x15
+    add x14,x15,x16
+    add x15,x16,x17
+    add x16,x17,x18
+    add x17,x18,x19
+    add x18,x19,x20
+    add x19,x20,x21
+    add x20,x21,x22
+    add x21,x22,x23
+    add x22,x23,x24
+    add x23,x24,x25
+    add x24,x25,x26
+    add x25,x26,x27
+    add x26,x27,x28
+    add x27,x28,x29
+    add x28,x29,x30
+    add x29,x30,x31
+
+    addi x30,x31,0
+    addi x31,x0,1
+    addi x0,x1,2
+    addi x1,x2,3
+    addi x2,x3,4
+    addi x3,x4,5
+    addi x4,x5,6
+    addi x5,x6,7
+    addi x6,x7,8
+    addi x7,x8,9
+    addi x8,x9,10
+    addi x9,x10,11
+    addi x10,x11,12
+    addi x11,x12,13
+    addi x12,x13,14
+    addi x13,x14,15
+    addi x14,x15,16
+    addi x15,x16,17
+    addi x16,x17,18
+    addi x17,x18,19
+    addi x18,x19,20
+    addi x19,x20,21
+    addi x20,x21,22
+    addi x21,x22,23
+    addi x22,x23,24
+    addi x23,x24,25
+    addi x24,x25,26
+    addi x25,x26,27
+    addi x26,x27,28
+    addi x27,x28,29
+    addi x28,x29,30
+    addi x29,x30,31
+
+    li x0,0
+    li x1,0
+    li x2,0
+    li x3,0
+    li x4,0
+    li x5,0
+    li x6,0
+    li x7,0
+    li x8,0
+    li x9,0
+    li x10,0
+    li x11,0
+    li x12,0
+    li x13,0
+    li x14,0
+    li x15,0
+    li x16,0
+    li x17,0
+    li x18,0
+    li x19,0
+    li x20,0
+    li x21,0
+    li x22,0
+    li x23,0
+    li x24,0
+    li x25,0
+    li x26,0
+    li x27,0
+    li x28,0
+    li x29,0
+    li x30,0
+    li x31,0
+
+    j _start
