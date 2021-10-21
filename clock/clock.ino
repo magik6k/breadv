@@ -1,5 +1,6 @@
 int pin_cl_latch = A0;
 int pin_cl_show = A1;
+int pin_reg_w = 4;
 
 int pin_cl_latch_mem = A3;
 int pin_cl_show_mem = A4;
@@ -14,6 +15,7 @@ int pin_mode = 3;
 void setup() {
   pinMode(pin_cl_latch, OUTPUT);
   pinMode(pin_cl_show, OUTPUT);
+  pinMode(pin_reg_w, OUTPUT);
 
   pinMode(pin_single, INPUT_PULLUP);
   pinMode(pin_mode, INPUT_PULLUP);
@@ -22,11 +24,12 @@ void setup() {
 enum state {  
   latch_hi,
   latch_lo,
+
+  mem_hi,
+  mem_lo,
     
   show_hi,
-  show_lo,  
-
-  // todo mem latch lo/hi
+  show_lo,
 };
 
 bool mode_single = true;
@@ -35,18 +38,30 @@ int i = latch_hi;
 
 void update() {
     switch (i) {
-      case latch_hi:
+    case latch_hi:
         digitalWrite(pin_cl_latch, HIGH);
-      break;
-      case latch_lo:
+        digitalWrite(pin_reg_w, LOW);
+    break;
+    case latch_lo:
         digitalWrite(pin_cl_latch, LOW);
-      break;
-      case show_hi:
+        digitalWrite(pin_reg_w, LOW);
+    break;
+    case mem_hi:
+        digitalWrite(pin_cl_latch, LOW);
+        digitalWrite(pin_reg_w, HIGH);
+    break;
+    case mem_lo:
+        digitalWrite(pin_cl_latch, LOW);
+        digitalWrite(pin_reg_w, LOW);
+    break;
+    case show_hi:
         digitalWrite(pin_cl_show, HIGH);
-      break;
-      case show_lo:
+        digitalWrite(pin_reg_w, LOW);
+    break;
+    case show_lo:
         digitalWrite(pin_cl_show, LOW);
-      break;
+        digitalWrite(pin_reg_w, LOW);
+    break;
     }
 }
 
