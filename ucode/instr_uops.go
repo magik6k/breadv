@@ -59,9 +59,13 @@ func uops1() {
 		u_alub_op0 byte = 0b0000_0010 // b=op2 otherwise
 
 		u_alu_add byte = 0b0000_0100
-		// or, xor, and
+		u_alu_or byte  = 0b0000_1000
+		u_alu_xor byte = 0b0001_0000
+		u_alu_and byte = 0b0010_0000
 
-		negated = u_alua_pc | u_alub_op0 | u_alu_add
+		u_mem_store byte = 0b0100_0000
+
+		negated = u_alua_pc | u_alub_op0 | u_alu_add | u_alu_or | u_alu_xor | u_alu_and
 	)
 
 	inmap := map[int]byte{
@@ -70,17 +74,27 @@ func uops1() {
 
 		ADD:  u_alu_add,
 		ADDI: u_alub_op0 | u_alu_add,
+
+		STORE: u_mem_store | u_alub_op0 | u_alu_add,
+
+		JALR: u_alua_pc | u_alu_add, // alub +4 todo!!
+		JAL: u_alua_pc | u_alu_add, // alub +4 todo!!
 	}
 
 	spreadAllFunct := func(instr int) {
 		for i := 0; i < 0b1000; i++ {
 			inmap[instr|(0b001_0000000*i)] = inmap[instr]
 		}
+		for i := 0; i < 0b1000; i++ {
+			inmap[instr|(0b001_0000000*i)|BIT30] = inmap[instr]
+		}
 	}
 
 	spreadAllFunct(LUI)
 	spreadAllFunct(AUIPC)
+	spreadAllFunct(JALR)
 	spreadAllFunct(JAL)
+	spreadAllFunct(STORE)
 
 	for i := range out {
 		out[i] = inmap[i] ^ negated
@@ -91,6 +105,44 @@ func uops1() {
 	}
 }
 
+func uops2() {
+	const size = 0x2000
+	var out [size]byte
+
+	var (
+		u_pc_op  byte = 0b0000_0001 // +4 otherwise
+		u_pc_rs1 byte = 0b0000_0010 // +pc otherwise
+
+		negated byte = 0
+	)
+
+	inmap := map[int]byte{
+		JALR: u_pc_op | u_pc_rs1,
+		JAL: u_pc_op,
+	}
+
+	spreadAllFunct := func(instr int) {
+		for i := 0; i < 0b1000; i++ {
+			inmap[instr|(0b001_0000000*i)] = inmap[instr]
+		}
+	}
+
+	spreadAllFunct(LUI)
+	spreadAllFunct(AUIPC)
+	spreadAllFunct(JALR)
+	spreadAllFunct(JAL)
+	spreadAllFunct(STORE)
+
+	for i := range out {
+		out[i] = inmap[i] ^ negated
+	}
+
+	if err := ioutil.WriteFile("instr_uops2.bin", out[:], 0664); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	uops1()
+	uops2()
 }
