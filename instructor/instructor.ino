@@ -1,9 +1,12 @@
 const int text_cap = 7000;
-unsigned char text[text_cap];
+volatile unsigned char text[text_cap];
 
-unsigned int start = 0x200;
-unsigned int len = 0x204 - 0x200 + 4;
-unsigned int at = 0;
+volatile unsigned char ex_temp[4];
+volatile bool run_temp = false;
+
+volatile unsigned int start = 0x200;
+volatile unsigned int len = 0x204 - 0x200 + 4;
+volatile unsigned int at = 0;
 
 inline void putWord(unsigned int w) {
   int ind = start+w;
@@ -31,18 +34,31 @@ inline void putWord(unsigned int w) {
   }
 }
 
+inline void putTemp() {
+  for(int i = 22; i < 54; i++) {
+     int idx = i-22;
+     digitalWrite(i, (ex_temp[(idx>>3)] & (1 << (idx & 0x7))) != 0);
+  }
+}
+
 int clock_pin = 2;
+
+void setupNop() {
+    text[0x200] = 0x13;
+    text[0x201] = 0x00;
+    text[0x202] = 0x00;
+    text[0x203] = 0x00;
+    text[0x204] = 0x13;
+    text[0x205] = 0x00;
+    text[0x206] = 0x00;
+    text[0x207] = 0x00;
+    len = 0x204 - 0x200 + 4;
+    at = 0;
+}
 
 void setup() {
   //nop
-  text[0x200] = 0x13;
-  text[0x201] = 0x00;
-  text[0x202] = 0x00;
-  text[0x203] = 0x00;
-  text[0x204] = 0x13;
-  text[0x205] = 0x00;
-  text[0x206] = 0x00;
-  text[0x207] = 0x00;
+  setupNop();
 
   for(int i = 22; i < 54; i++) {
     pinMode(i, OUTPUT);
@@ -68,6 +84,7 @@ Serial example
 
 > P - ping
 < P - pong
+
 > T - start transfer
 (stop interrupts)
 < B - ready for transfer
@@ -77,8 +94,17 @@ Serial example
 < D[crc32 of data] - ack
 (restart interrupts)
 
+> X - execute single
+> [4b instr]
+< A - ack
+...
+< D - executed
+
 */
 
+// W = wait
+// R = receive
+// Y = yield execution
 char mode = 'W';
 uint16_t to_recv;
 
@@ -119,7 +145,28 @@ void loop() {
       at = 0;
 
       mode = 'R';
-    break;      
+    break;
+    case 'X': // execute
+        detachInterrupt(digitalPinToInterrupt(clock_pin));
+        setupNop();
+        run_temp = false;
+        attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
+
+        while(Serial.available() == 0);
+        ex_temp[3] = Serial.read();
+        while(Serial.available() == 0);
+        ex_temp[2] = Serial.read();
+        while(Serial.available() == 0);
+        ex_temp[1] = Serial.read();
+        while(Serial.available() == 0);
+        ex_temp[0] = Serial.read();
+
+        Serial.write('A');
+
+        run_temp = true;
+        while(run_temp);
+        Serial.write('D');
+      break;
     default:
       Serial.write('?');
     }
@@ -144,8 +191,14 @@ void loop() {
 
 
 void clk() {
+  if(run_temp) {
+    putTemp();
+    digitalWrite(LED_BUILTIN, 1);
+    run_temp = false;
+    return;
+  }
   putWord(at);
-  digitalWrite(LED_BUILTIN, (at&4)>0);  
+  digitalWrite(LED_BUILTIN, 0);
   at += 4;
 
   if(at >= len) {

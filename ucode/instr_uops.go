@@ -89,6 +89,18 @@ func uops1() {
 			inmap[instr|(0b001_0000000*i)|BIT30] = inmap[instr]
 		}
 	}
+	spreadBit30 := func(instr int) {
+		inmap[instr|BIT30] = inmap[instr]
+	}
+
+	spreadBit30(ADDI)
+	spreadBit30(SLLI)
+	spreadBit30(SLTI)
+	spreadBit30(SLTUI)
+	spreadBit30(XORI)
+	spreadBit30(SRLI)
+	spreadBit30(ORI)
+	spreadBit30(ANDI)
 
 	spreadAllFunct(LUI)
 	spreadAllFunct(AUIPC)
@@ -125,7 +137,22 @@ func uops2() {
 		for i := 0; i < 0b1000; i++ {
 			inmap[instr|(0b001_0000000*i)] = inmap[instr]
 		}
+		for i := 0; i < 0b1000; i++ {
+			inmap[instr|(0b001_0000000*i)|BIT30] = inmap[instr]
+		}
 	}
+	spreadBit30 := func(instr int) {
+		inmap[instr|BIT30] = inmap[instr]
+	}
+
+	spreadBit30(ADDI)
+	spreadBit30(SLLI)
+	spreadBit30(SLTI)
+	spreadBit30(SLTUI)
+	spreadBit30(XORI)
+	spreadBit30(SRLI)
+	spreadBit30(ORI)
+	spreadBit30(ANDI)
 
 	spreadAllFunct(LUI)
 	spreadAllFunct(AUIPC)
