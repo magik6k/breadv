@@ -3,6 +3,8 @@ volatile unsigned char text[text_cap];
 
 volatile unsigned char ex_temp[4];
 volatile bool run_temp = false;
+volatile bool toggle_handoff = false;
+volatile bool in_handoff = false;
 
 volatile unsigned int start = 0x200;
 volatile unsigned int len = 0x204 - 0x200 + 4;
@@ -42,6 +44,7 @@ inline void putTemp() {
 }
 
 int clock_pin = 2;
+int handoff_pin = 3;
 
 void setupNop() {
     text[0x200] = 0x13;
@@ -56,13 +59,28 @@ void setupNop() {
     at = 0;
 }
 
+void setupOutput() {
+    in_handoff = false;
+    digitalWrite(handoff_pin, HIGH);
+    for(int i = 22; i < 54; i++) {
+        pinMode(i, OUTPUT);
+    }
+}
+
+void setupHandoff() {
+    for(int i = 22; i < 54; i++) {
+        pinMode(i, INPUT);
+    }
+    in_handoff = true;
+    digitalWrite(handoff_pin, LOW);
+}
+
 void setup() {
+  pinMode(handoff_pin, OUTPUT);
+
   //nop
   setupNop();
-
-  for(int i = 22; i < 54; i++) {
-    pinMode(i, OUTPUT);
-  }
+  setupOutput();
 
   putWord(0);
   
@@ -99,6 +117,17 @@ Serial example
 < A - ack
 ...
 < D - executed
+
+> Y - handoff
+> [4b instr]
+< A - ack
+...
+< - D - handed off
+
+> P - ping
+< P - pong, exit handoff
+
+
 
 */
 
@@ -146,6 +175,7 @@ void loop() {
 
       mode = 'R';
     break;
+    case 'Y': // handoff
     case 'X': // execute
         detachInterrupt(digitalPinToInterrupt(clock_pin));
         setupNop();
@@ -163,9 +193,15 @@ void loop() {
 
         Serial.write('A');
 
+        toggle_handoff = sb == 'Y';
         run_temp = true;
-        while(run_temp);
+
+        while(run_temp || toggle_handoff);
         Serial.write('D');
+
+        if(sb == 'Y') {
+            mode = 'Y';
+        }
       break;
     default:
       Serial.write('?');
@@ -186,17 +222,45 @@ void loop() {
     attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
     mode = 'W';
   break;
+  case 'Y':
+    switch(sb) {
+    case 'P': // ping; exit handoff
+      toggle_handoff = true;
+      while(toggle_handoff);
+
+      Serial.write('P');
+      mode = 'W';
+    break;
+    default:
+      Serial.write('?');
+    }
+  break;
   }
 }
 
 
 void clk() {
+  if(in_handoff) {
+    if(!toggle_handoff) {
+        return;
+    }
+
+    setupOutput();
+    toggle_handoff = false;
+  }
+
   if(run_temp) {
     putTemp();
     digitalWrite(LED_BUILTIN, 1);
     run_temp = false;
     return;
   }
+  if(toggle_handoff) {
+    setupHandoff();
+    toggle_handoff = false;
+    return;
+  }
+
   putWord(at);
   digitalWrite(LED_BUILTIN, 0);
   at += 4;

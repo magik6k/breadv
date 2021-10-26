@@ -201,14 +201,19 @@ func main() {
 		resp.WriteHeader(http.StatusOK)
 	})
 
-	exec := func(resp http.ResponseWriter, req *http.Request, pb string) bool {
+	const (
+		ExecOne = 'X'
+		ExecHandoff = 'Y'
+	)
+
+	exec := func(resp http.ResponseWriter, req *http.Request, pb string, mode byte) bool {
 		instr, err := hex.DecodeString(pb)
 		if err != nil {
 			http.Error(resp, fmt.Errorf("decode hex instr: %w", err).Error(), http.StatusInternalServerError)
 			return true
 		}
 
-		_, err = port.Write([]byte{'X'})
+		_, err = port.Write([]byte{mode})
 		if err != nil {
 			http.Error(resp, fmt.Errorf("start exec: %w", err).Error(), http.StatusInternalServerError)
 			return true
@@ -266,7 +271,7 @@ func main() {
 			return
 		}
 
-		if exec(resp, req, pb) {
+		if exec(resp, req, pb, ExecOne) {
 			return
 		}
 
@@ -278,6 +283,28 @@ func main() {
 		resp.WriteHeader(http.StatusOK)
 	})
 
+	http.HandleFunc("/handoff/", func(resp http.ResponseWriter, req *http.Request) {
+		hndlk.Lock()
+		defer hndlk.Unlock()
+
+		if err := ping(); err != nil {
+			http.Error(resp, fmt.Errorf("ping error: %w", err).Error(), http.StatusBadGateway)
+			return
+		}
+
+		pb := path.Base(req.URL.Path)
+		if len(pb) != 8 {
+			http.Error(resp, fmt.Errorf("path base len bust be 8").Error(), http.StatusBadRequest)
+			return
+		}
+
+		log.Println("Handoff:")
+		if exec(resp, req, pb, ExecHandoff) {
+			return
+		}
+
+		resp.WriteHeader(http.StatusOK)
+	})
 
 	http.HandleFunc("/load/", func(resp http.ResponseWriter, req *http.Request) {
 		hndlk.Lock()
@@ -321,7 +348,7 @@ func main() {
 		// set addr to 0
 		at := int32(0)
 		instr := uint32(0) | RS1_X0 | RD_X2 | ADDI
-		if exec(resp,req,fmt.Sprintf("%08x", instr)) {
+		if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 			return
 		}
 
@@ -331,12 +358,12 @@ func main() {
 			k := (n-m) >> 12
 
 			var instr = uint32(k << 12) | RD_X1 | LUI
-			if exec(resp,req,fmt.Sprintf("%08x", instr)) {
+			if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 				return
 			}
 
 			instr = uint32(m << 20) | RS1_X1 | RD_X1 | ADDI
-			if exec(resp,req,fmt.Sprintf("%08x", instr)) {
+			if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 				return
 			}
 
@@ -347,14 +374,14 @@ func main() {
 
 				if k != at {
 					instr = uint32(k << 12) | RD_X2 | LUI
-					if exec(resp,req,fmt.Sprintf("%08x", instr)) {
+					if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 						return
 					}
 					at = k
 				}
 
 				instr = uint32((m >> 5) << 25) | RS2_X1 | RS1_X2 | uint32((m & 0b11111) << 7) | STORE
-				if exec(resp,req,fmt.Sprintf("%08x", instr)) {
+				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 					return
 				}
 			}

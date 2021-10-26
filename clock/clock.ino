@@ -12,10 +12,18 @@ int pin_freqmod = A5;
 int pin_single = 2;
 int pin_mode = 3;
 
+int pin_trap_enable = 10;
+int pin_trap_level = 11;
+int pin_trap = 12;
+
 void setup() {
   pinMode(pin_cl_latch, OUTPUT);
   pinMode(pin_cl_show, OUTPUT);
   pinMode(pin_reg_w, OUTPUT);
+
+  pinMode(pin_trap_enable, INPUT_PULLUP);
+  pinMode(pin_trap_level, INPUT_PULLUP);
+  pinMode(pin_trap, INPUT);
 
   pinMode(pin_single, INPUT_PULLUP);
   pinMode(pin_mode, INPUT_PULLUP);
@@ -97,8 +105,15 @@ void loop() {
 
   } else {
     int d = analogRead(pin_freqmod)+1;
+
     for(; i <= show_lo; i++) {
         delay(d);
+
+        if(digitalRead(pin_trap_enable)==0 && digitalRead(pin_trap_level) == digitalRead(pin_trap)) {
+            mode_single = true;
+            return;
+        }
+
         update();
     }
   }
