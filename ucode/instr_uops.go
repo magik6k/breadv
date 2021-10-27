@@ -24,7 +24,9 @@ const (
 	F_OR   = 0b110
 	F_AND  = 0b111
 
-	BIT30 = 0b1_000_00000_00
+	BIT30 = 0b1_000_00000_00 // A10
+
+	DISCARD = 0b1_0_000_00000_00 // A11
 
 	ADD = (F_ADD << 7) | ARITH
 	SLL = (F_SLL << 7) | ARITH
@@ -65,20 +67,22 @@ func uops1() {
 
 		u_mem_store byte = 0b0100_0000
 
-		negated = u_alua_pc | u_alub_op0 | u_alu_add | u_alu_or | u_alu_xor | u_alu_and
+		u_rd byte = 0b1000_0000
+
+		negated = u_alua_pc | u_alub_op0 | u_alu_add | u_alu_or | u_alu_xor | u_alu_and | u_rd
 	)
 
 	inmap := map[int]byte{
-		LUI:   u_alub_op0 | u_alu_add,
-		AUIPC: u_alua_pc | u_alub_op0 | u_alu_add,
+		LUI:   u_alub_op0 | u_alu_add | u_rd,
+		AUIPC: u_alua_pc | u_alub_op0 | u_alu_add | u_rd,
 
-		ADD:  u_alu_add,
-		ADDI: u_alub_op0 | u_alu_add,
+		ADD:  u_alu_add | u_rd,
+		ADDI: u_alub_op0 | u_alu_add | u_rd,
 
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
 
-		JALR: u_alua_pc | u_alu_add, // alub +4 todo!!
-		JAL: u_alua_pc | u_alu_add, // alub +4 todo!!
+		JALR: u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
+		JAL: u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
 	}
 
 	spreadAllFunct := func(instr int) {
@@ -109,7 +113,11 @@ func uops1() {
 	spreadAllFunct(STORE)
 
 	for i := range out {
-		out[i] = inmap[i] ^ negated
+		if i&DISCARD > 0 {
+			out[i] = u_alu_add ^ negated
+		} else {
+			out[i] = inmap[i] ^ negated
+		}
 	}
 
 	if err := ioutil.WriteFile("instr_uops1.bin", out[:], 0664); err != nil {
@@ -161,7 +169,11 @@ func uops2() {
 	spreadAllFunct(STORE)
 
 	for i := range out {
-		out[i] = inmap[i] ^ negated
+		if i&DISCARD > 0 {
+			out[i] = negated
+		} else {
+			out[i] = inmap[i] ^ negated
+		}
 	}
 
 	if err := ioutil.WriteFile("instr_uops2.bin", out[:], 0664); err != nil {

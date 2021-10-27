@@ -1,4 +1,4 @@
-const int text_cap = 7000;
+const int text_cap = 1000;
 volatile unsigned char text[text_cap];
 
 volatile unsigned char ex_temp[4];
@@ -88,7 +88,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
 
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(115200);
+  Serial.begin(115200, SERIAL_8O1);
   
 //  for(int i = 0; i < 4; i++) {
 //  for(int j = 0; j < 8; j++) {
@@ -180,7 +180,8 @@ void loop() {
         detachInterrupt(digitalPinToInterrupt(clock_pin));
         setupNop();
         run_temp = false;
-        attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
+
+        Serial.write('R');
 
         while(Serial.available() == 0);
         ex_temp[3] = Serial.read();
@@ -190,6 +191,8 @@ void loop() {
         ex_temp[1] = Serial.read();
         while(Serial.available() == 0);
         ex_temp[0] = Serial.read();
+
+        attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
 
         Serial.write('A');
 

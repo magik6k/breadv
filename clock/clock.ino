@@ -104,10 +104,15 @@ void loop() {
   }
 
   } else {
-    int d = analogRead(pin_freqmod)+1;
+    int32_t d = analogRead(pin_freqmod)+1;
+    int32_t dus = d*d;
 
     for(; i <= show_lo; i++) {
-        delay(d);
+        if(dus > 1024) {
+            delay(dus/1024);
+        } else {
+            delayMicroseconds(dus);
+        }
 
         if(digitalRead(pin_trap_enable)==0 && digitalRead(pin_trap_level) == digitalRead(pin_trap)) {
             mode_single = true;

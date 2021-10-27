@@ -42,7 +42,7 @@ func main() {
 	mode := &serial.Mode{
 		BaudRate: 115200,
 		DataBits: 8,
-		Parity: serial.NoParity,
+		Parity: serial.OddParity,
 		StopBits: serial.OneStopBit,
 	}
 
@@ -206,11 +206,25 @@ func main() {
 		ExecHandoff = 'Y'
 	)
 
-	exec := func(resp http.ResponseWriter, req *http.Request, pb string, mode byte) bool {
+	storeDiscard := 0
+
+	var exec func(resp http.ResponseWriter, req *http.Request, pb string, mode byte) bool
+	exec = func(resp http.ResponseWriter, req *http.Request, pb string, mode byte) bool {
+		storeDiscard <<= 1
+
+		if storeDiscard & 0b1000 > 0 {
+			// will be discarded, send nop
+			exec(resp, req, "00000013", ExecOne)
+		}
+
 		instr, err := hex.DecodeString(pb)
 		if err != nil {
 			http.Error(resp, fmt.Errorf("decode hex instr: %w", err).Error(), http.StatusInternalServerError)
 			return true
+		}
+
+		if instr[3] & 0x7f == STORE {
+			storeDiscard |= 1
 		}
 
 		_, err = port.Write([]byte{mode})
@@ -218,6 +232,20 @@ func main() {
 			http.Error(resp, fmt.Errorf("start exec: %w", err).Error(), http.StatusInternalServerError)
 			return true
 		}
+
+		var readBuf [1]byte
+		_, err = port.Read(readBuf[:])
+		if err != nil {
+			http.Error(resp, fmt.Errorf("start transfer ack: %w", err).Error(), http.StatusInternalServerError)
+			return true
+		}
+
+		if readBuf[0] != 'R' {
+			http.Error(resp, fmt.Errorf("bad ready resp: %x", readBuf[0]).Error(), http.StatusInternalServerError)
+			return true
+		}
+
+		fmt.Printf("Ready > ")
 
 		_, err = port.Write(instr)
 		if err != nil {
@@ -227,7 +255,6 @@ func main() {
 
 		fmt.Printf("Execute %s > ", pb)
 
-		var readBuf [1]byte
 		_, err = port.Read(readBuf[:])
 		if err != nil {
 			http.Error(resp, fmt.Errorf("start transfer ack: %w", err).Error(), http.StatusInternalServerError)
