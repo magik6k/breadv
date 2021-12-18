@@ -384,6 +384,30 @@ func main() {
 			m := (n << 20) >> 20
 			k := (n-m) >> 12
 
+			fmt.Printf("LOAD > %08x\n", uint32(n))
+
+
+			{
+				var instr = LUI
+				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+			}
+
+
+
 			var instr = uint32(k << 12) | RD_X1 | LUI
 			if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 				return
@@ -400,6 +424,24 @@ func main() {
 				k := (n-m) >> 12
 
 				if k != at {
+					{
+						var instr = LUI
+						if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+							return
+						}
+						if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+							return
+						}
+						if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+							return
+						}
+						if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+							return
+						}
+						if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+							return
+						}
+					}
 					instr = uint32(k << 12) | RD_X2 | LUI
 					if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
 						return

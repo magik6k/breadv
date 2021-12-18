@@ -24,9 +24,19 @@ const (
 	F_OR   = 0b110
 	F_AND  = 0b111
 
+	// FUNC BRANCH
+	F_BEQ = 0b000
+	F_BNE = 0b001
+	F_BLT = 0b100
+	F_BGE = 0b101
+	F_BLTU = 0b110
+	F_BGEU = 0b111
+
 	BIT30 = 0b1_000_00000_00 // A10
 
 	DISCARD = 0b1_0_000_00000_00 // A11
+
+	CMP_IN = 0b1_0_0_000_00000_00 // A12
 
 	ADD = (F_ADD << 7) | ARITH
 	SLL = (F_SLL << 7) | ARITH
@@ -48,6 +58,13 @@ const (
 	ORI = (F_OR << 7) | ARITHI
 	ANDI = (F_AND << 7) | ARITHI
 	// SRAI?
+
+	BEQ = (F_BEQ << 7) | BRANCH
+	BNE = (F_BNE << 7) | BRANCH
+	BLT = (F_BLT << 7) | BRANCH
+	BGE = (F_BGE << 7) | BRANCH
+	BLTU = (F_BLTU << 7) | BRANCH
+	BGEU = (F_BGEU << 7) | BRANCH
 )
 
 
@@ -91,10 +108,14 @@ func uops1() {
 		}
 		for i := 0; i < 0b1000; i++ {
 			inmap[instr|(0b001_0000000*i)|BIT30] = inmap[instr]
+			inmap[instr|(0b001_0000000*i)|CMP_IN] = inmap[instr]
+			inmap[instr|(0b001_0000000*i)|BIT30|CMP_IN] = inmap[instr]
 		}
 	}
 	spreadBit30 := func(instr int) {
 		inmap[instr|BIT30] = inmap[instr]
+		inmap[instr|CMP_IN] = inmap[instr]
+		inmap[instr|BIT30|CMP_IN] = inmap[instr]
 	}
 
 	spreadBit30(ADDI)
@@ -105,6 +126,15 @@ func uops1() {
 	spreadBit30(SRLI)
 	spreadBit30(ORI)
 	spreadBit30(ANDI)
+
+	spreadBit30(ADD)
+	spreadBit30(SLL)
+	spreadBit30(SLT)
+	spreadBit30(SLTU)
+	spreadBit30(XOR)
+	spreadBit30(SRL)
+	spreadBit30(OR)
+	spreadBit30(AND)
 
 	spreadAllFunct(LUI)
 	spreadAllFunct(AUIPC)
@@ -133,12 +163,33 @@ func uops2() {
 		u_pc_op  byte = 0b0000_0001 // +4 otherwise
 		u_pc_rs1 byte = 0b0000_0010 // +pc otherwise
 
+		u_cmp_lt  byte = 0b0000_0100
+		u_cmp_sig byte = 0b0000_1000
+
 		negated byte = 0
 	)
 
 	inmap := map[int]byte{
 		JALR: u_pc_op | u_pc_rs1,
 		JAL: u_pc_op,
+
+		BEQ: 0,
+		BNE: u_pc_op,
+
+		BLT: u_cmp_lt,
+		BGE: u_cmp_lt | u_pc_op,
+
+		BLTU: u_cmp_sig | u_cmp_lt,
+		BGEU: u_cmp_sig | u_cmp_lt | u_pc_op,
+
+		BEQ | CMP_IN: u_pc_op,
+		BNE | CMP_IN: 0,
+
+		BLT | CMP_IN: u_cmp_lt | u_pc_op,
+		BGE | CMP_IN: u_cmp_lt,
+
+		BLTU | CMP_IN: u_cmp_sig | u_cmp_lt | u_pc_op,
+		BGEU | CMP_IN: u_cmp_sig | u_cmp_lt,
 	}
 
 	spreadAllFunct := func(instr int) {
@@ -147,26 +198,51 @@ func uops2() {
 		}
 		for i := 0; i < 0b1000; i++ {
 			inmap[instr|(0b001_0000000*i)|BIT30] = inmap[instr]
+			inmap[instr|(0b001_0000000*i)|CMP_IN] = inmap[instr]
+			inmap[instr|(0b001_0000000*i)|BIT30|CMP_IN] = inmap[instr]
 		}
+	}
+	spreadBit30Cmp := func(instr int) {
+		inmap[instr|BIT30] = inmap[instr]
+		inmap[instr|CMP_IN] = inmap[instr]
+		inmap[instr|BIT30|CMP_IN] = inmap[instr]
 	}
 	spreadBit30 := func(instr int) {
 		inmap[instr|BIT30] = inmap[instr]
+		inmap[instr|BIT30|CMP_IN] = inmap[instr|CMP_IN]
 	}
 
-	spreadBit30(ADDI)
-	spreadBit30(SLLI)
-	spreadBit30(SLTI)
-	spreadBit30(SLTUI)
-	spreadBit30(XORI)
-	spreadBit30(SRLI)
-	spreadBit30(ORI)
-	spreadBit30(ANDI)
+	spreadBit30Cmp(ADDI)
+	spreadBit30Cmp(SLLI)
+	spreadBit30Cmp(SLTI)
+	spreadBit30Cmp(SLTUI)
+	spreadBit30Cmp(XORI)
+	spreadBit30Cmp(SRLI)
+	spreadBit30Cmp(ORI)
+	spreadBit30Cmp(ANDI)
+
+	// no add, it's sub on b30
+	inmap[ADD|CMP_IN] = inmap[ADD]
+	spreadBit30Cmp(SLL)
+	spreadBit30Cmp(SLT)
+	spreadBit30Cmp(SLTU)
+	spreadBit30Cmp(XOR)
+	spreadBit30Cmp(SRL)
+	spreadBit30Cmp(OR)
+	spreadBit30Cmp(AND)
 
 	spreadAllFunct(LUI)
 	spreadAllFunct(AUIPC)
 	spreadAllFunct(JALR)
 	spreadAllFunct(JAL)
 	spreadAllFunct(STORE)
+
+	spreadBit30(BEQ)
+	spreadBit30(BNE)
+	spreadBit30(BLT)
+	spreadBit30(BGE)
+	spreadBit30(BLTU)
+	spreadBit30(BGEU)
 
 	for i := range out {
 		if i&DISCARD > 0 {

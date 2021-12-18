@@ -35,7 +35,4 @@ _start:
     add x31, x30, x30
     add x1, x31, x31
 
-    nop
-    nop
-    nop
-    nop
+    j _start
