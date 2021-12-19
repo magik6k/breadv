@@ -1,9 +1,10 @@
-int pin_cl_latch = A0;
-int pin_cl_show = A1;
-int pin_reg_w = 4;
+uint8_t pin_cl_latch = 1 << 4;
+uint8_t pin_cl_show = 1 << 5;
+uint8_t pin_reg_w = 1 << 6;
 
-int pin_cl_latch_mem = A3;
-int pin_cl_show_mem = A4;
+uint8_t ppin_cl_latch = 8;
+uint8_t ppin_cl_show = 9;
+uint8_t ppin_reg_w = 10;
 
 int pin_mem_act = A2;
 
@@ -12,14 +13,14 @@ int pin_freqmod = A5;
 int pin_single = 2;
 int pin_mode = 3;
 
-int pin_trap_enable = 10;
+int pin_trap_enable = 13;
 int pin_trap_level = 11;
 int pin_trap = 12;
 
 void setup() {
-  pinMode(pin_cl_latch, OUTPUT);
-  pinMode(pin_cl_show, OUTPUT);
-  pinMode(pin_reg_w, OUTPUT);
+  pinMode(ppin_cl_latch, OUTPUT);
+  pinMode(ppin_cl_show, OUTPUT);
+  pinMode(ppin_reg_w, OUTPUT);
 
   pinMode(pin_trap_enable, INPUT_PULLUP);
   pinMode(pin_trap_level, INPUT_PULLUP);
@@ -44,31 +45,39 @@ bool mode_single = true;
 
 int i = latch_hi;
 
+inline void writeb(uint8_t bit, uint8_t val) {
+    if (val == LOW) {
+        PORTB &= ~bit;
+    } else {
+        PORTB |= bit;
+    }
+}
+
 void update() {
     switch (i) {
     case latch_hi:
-        digitalWrite(pin_cl_latch, HIGH);
-        digitalWrite(pin_reg_w, LOW);
+        writeb(pin_cl_latch, HIGH);
+        writeb(pin_reg_w, LOW);
     break;
     case latch_lo:
-        digitalWrite(pin_cl_latch, LOW);
-        digitalWrite(pin_reg_w, LOW);
+        writeb(pin_cl_latch, LOW);
+        writeb(pin_reg_w, LOW);
     break;
     case mem_hi:
-        digitalWrite(pin_cl_latch, LOW);
-        digitalWrite(pin_reg_w, HIGH);
+        writeb(pin_cl_latch, LOW);
+        writeb(pin_reg_w, HIGH);
     break;
     case mem_lo:
-        digitalWrite(pin_cl_latch, LOW);
-        digitalWrite(pin_reg_w, LOW);
+        writeb(pin_cl_latch, LOW);
+        writeb(pin_reg_w, LOW);
     break;
     case show_hi:
-        digitalWrite(pin_cl_show, HIGH);
-        digitalWrite(pin_reg_w, LOW);
+        writeb(pin_cl_show, HIGH);
+        writeb(pin_reg_w, LOW);
     break;
     case show_lo:
-        digitalWrite(pin_cl_show, LOW);
-        digitalWrite(pin_reg_w, LOW);
+        writeb(pin_cl_show, LOW);
+        writeb(pin_reg_w, LOW);
     break;
     }
 }
