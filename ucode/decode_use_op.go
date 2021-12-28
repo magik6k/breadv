@@ -62,7 +62,7 @@ func main() {
 		out[i] = opmap[i&0x1f]
 
 		// rs2
-		out[i] |= rs2map[i&0x1f]^rs2_disable
+		out[i] |= rs2map[i&0x1f] ^ rs2_disable
 		if i&rs2_zero > 0 {
 			out[i] |= rs2_disable
 		}

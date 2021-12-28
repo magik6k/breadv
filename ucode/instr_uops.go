@@ -25,10 +25,10 @@ const (
 	F_AND  = 0b111
 
 	// FUNC BRANCH
-	F_BEQ = 0b000
-	F_BNE = 0b001
-	F_BLT = 0b100
-	F_BGE = 0b101
+	F_BEQ  = 0b000
+	F_BNE  = 0b001
+	F_BLT  = 0b100
+	F_BGE  = 0b101
 	F_BLTU = 0b110
 	F_BGEU = 0b111
 
@@ -38,36 +38,34 @@ const (
 
 	CMP_IN = 0b1_0_0_000_00000_00 // A12
 
-	ADD = (F_ADD << 7) | ARITH
-	SLL = (F_SLL << 7) | ARITH
-	SLT = (F_SLT << 7) | ARITH
+	ADD  = (F_ADD << 7) | ARITH
+	SLL  = (F_SLL << 7) | ARITH
+	SLT  = (F_SLT << 7) | ARITH
 	SLTU = (F_SLTU << 7) | ARITH
-	XOR = (F_XOR << 7) | ARITH
-	SRL = (F_SRL << 7) | ARITH
-	OR = (F_OR << 7) | ARITH
-	AND = (F_AND << 7) | ARITH
+	XOR  = (F_XOR << 7) | ARITH
+	SRL  = (F_SRL << 7) | ARITH
+	OR   = (F_OR << 7) | ARITH
+	AND  = (F_AND << 7) | ARITH
 	SUB  = ADD | BIT30 // non-i, bit 30=1
-	SRA  = SRL | BIT30  // bit 30=1
+	SRA  = SRL | BIT30 // bit 30=1
 
-	ADDI = (F_ADD << 7) | ARITHI
-	SLLI = (F_SLL << 7) | ARITHI
-	SLTI = (F_SLT << 7) | ARITHI
+	ADDI  = (F_ADD << 7) | ARITHI
+	SLLI  = (F_SLL << 7) | ARITHI
+	SLTI  = (F_SLT << 7) | ARITHI
 	SLTUI = (F_SLTU << 7) | ARITHI
-	XORI = (F_XOR << 7) | ARITHI
-	SRLI = (F_SRL << 7) | ARITHI
-	ORI = (F_OR << 7) | ARITHI
-	ANDI = (F_AND << 7) | ARITHI
+	XORI  = (F_XOR << 7) | ARITHI
+	SRLI  = (F_SRL << 7) | ARITHI
+	ORI   = (F_OR << 7) | ARITHI
+	ANDI  = (F_AND << 7) | ARITHI
 	// SRAI?
 
-	BEQ = (F_BEQ << 7) | BRANCH
-	BNE = (F_BNE << 7) | BRANCH
-	BLT = (F_BLT << 7) | BRANCH
-	BGE = (F_BGE << 7) | BRANCH
+	BEQ  = (F_BEQ << 7) | BRANCH
+	BNE  = (F_BNE << 7) | BRANCH
+	BLT  = (F_BLT << 7) | BRANCH
+	BGE  = (F_BGE << 7) | BRANCH
 	BLTU = (F_BLTU << 7) | BRANCH
 	BGEU = (F_BGEU << 7) | BRANCH
 )
-
-
 
 func uops1() {
 	const size = 0x2000
@@ -78,7 +76,7 @@ func uops1() {
 		u_alub_op0 byte = 0b0000_0010 // b=op2 otherwise
 
 		u_alu_add byte = 0b0000_0100
-		u_alu_or byte  = 0b0000_1000
+		u_alu_or  byte = 0b0000_1000
 		u_alu_xor byte = 0b0001_0000
 		u_alu_and byte = 0b0010_0000
 
@@ -105,7 +103,7 @@ func uops1() {
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
 
 		JALR: u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
-		JAL: u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
+		JAL:  u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
 	}
 
 	spreadAllFunct := func(instr int) {
@@ -177,7 +175,7 @@ func uops2() {
 
 	inmap := map[int]byte{
 		JALR: u_pc_op | u_pc_rs1,
-		JAL: u_pc_op,
+		JAL:  u_pc_op,
 
 		BEQ: 0,
 		BNE: u_pc_op,
