@@ -95,6 +95,12 @@ func uops1() {
 
 		ADD:  u_alu_add | u_rd,
 		ADDI: u_alub_op0 | u_alu_add | u_rd,
+		XOR:  u_alu_xor | u_rd,
+		XORI: u_alub_op0 | u_alu_xor | u_rd,
+		OR:   u_alu_or | u_rd,
+		ORI:  u_alub_op0 | u_alu_or | u_rd,
+		AND:  u_alu_and | u_rd,
+		ANDI: u_alub_op0 | u_alu_and | u_rd,
 
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
 
