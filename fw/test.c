@@ -1,5 +1,6 @@
+#include "drv/gpio.h"
 
 int main(void) {
-        kputc4("HII\n");
+        gpio_set_bank0(0x00);
         return 0;
 }
