@@ -101,9 +101,10 @@ func uops1() {
 		ANDI: u_alub_op0 | u_alu_and | u_rd,
 
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
+		LOAD: u_alub_op0 | u_alu_add,
 
-		JALR: u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
-		JAL:  u_alua_pc | u_alu_add | u_rd, // alub +4 todo!!
+		JALR: u_alua_pc | u_alu_add | u_rd,
+		JAL:  u_alua_pc | u_alu_add | u_rd,
 	}
 
 	spreadAllFunct := func(instr int) {
@@ -145,6 +146,7 @@ func uops1() {
 	spreadAllFunct(JALR)
 	spreadAllFunct(JAL)
 	spreadAllFunct(STORE)
+	spreadAllFunct(LOAD)
 
 	for i := range out {
 		if i&DISCARD > 0 {
@@ -170,12 +172,16 @@ func uops2() {
 		u_cmp_lt  byte = 0b0000_0100
 		u_cmp_sig byte = 0b0000_1000
 
-		negated byte = 0
+		u_mem_load_store byte = 0b0001_0000
+
+		u_alu_b_plus4 byte = 0b0010_0000
+
+		negated = u_mem_load_store
 	)
 
 	inmap := map[int]byte{
-		JALR: u_pc_op | u_pc_rs1,
-		JAL:  u_pc_op,
+		JALR: u_pc_op | u_pc_rs1 | u_alu_b_plus4,
+		JAL:  u_pc_op | u_alu_b_plus4,
 
 		BEQ: 0,
 		BNE: u_pc_op,
@@ -194,6 +200,9 @@ func uops2() {
 
 		BLTU | CMP_IN: u_cmp_sig | u_cmp_lt | u_pc_op,
 		BGEU | CMP_IN: u_cmp_sig | u_cmp_lt,
+
+		STORE: u_mem_load_store,
+		LOAD:  u_mem_load_store,
 	}
 
 	spreadAllFunct := func(instr int) {
@@ -240,6 +249,7 @@ func uops2() {
 	spreadAllFunct(JALR)
 	spreadAllFunct(JAL)
 	spreadAllFunct(STORE)
+	spreadAllFunct(LOAD)
 
 	spreadBit30(BEQ)
 	spreadBit30(BNE)
