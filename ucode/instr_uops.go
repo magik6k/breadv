@@ -60,7 +60,7 @@ const (
 	ADDI  = (F_ADD << 7) | ARITHI
 	SLLI  = (F_SLL << 7) | ARITHI
 	SLTI  = (F_SLT << 7) | ARITHI
-	SLTUI = (F_SLTU << 7) | ARITHI
+	SLTIU = (F_SLTU << 7) | ARITHI
 	XORI  = (F_XOR << 7) | ARITHI
 	SRLI  = (F_SRL << 7) | ARITHI
 	ORI   = (F_OR << 7) | ARITHI
@@ -115,6 +115,11 @@ func uops1() {
 		AND:  u_alu_and | u_rd,
 		ANDI: u_alub_op0 | u_alu_and | u_rd,
 
+		SLTI:  u_alub_op0 | u_rd,
+		SLTIU: u_alub_op0 | u_rd,
+		SLT:   u_rd,
+		SLTU:  u_rd,
+
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
 		LOAD: u_alub_op0 | u_alu_add,
 
@@ -148,7 +153,7 @@ func uops1() {
 	spreadBit30(ADDI)
 	spreadBit30(SLLI)
 	spreadBit30(SLTI)
-	spreadBit30(SLTUI)
+	spreadBit30(SLTIU)
 	spreadBit30(XORI)
 	spreadBit30(SRLI)
 	spreadBit30(ORI)
@@ -207,10 +212,17 @@ func uops2() {
 
 		u_csr_w byte = 0b0100_0000
 
-		negated = u_mem_load_store | u_csr_w
+		u_alu_slt byte = 0b1000_0000
+
+		negated = u_mem_load_store | u_csr_w | u_alu_slt
 	)
 
 	inmap := map[int]byte{
+		SLTI:  u_alu_slt | u_cmp_lt,
+		SLTIU: u_alu_slt | u_cmp_lt | u_cmp_sig,
+		SLT:   u_alu_slt | u_cmp_lt,
+		SLTU:  u_alu_slt | u_cmp_lt | u_cmp_sig,
+
 		JALR: u_pc_op | u_pc_rs1 | u_alu_b_plus4,
 		JAL:  u_pc_op | u_alu_b_plus4,
 
@@ -266,7 +278,7 @@ func uops2() {
 	spreadBit30Cmp(ADDI)
 	spreadBit30Cmp(SLLI)
 	spreadBit30Cmp(SLTI)
-	spreadBit30Cmp(SLTUI)
+	spreadBit30Cmp(SLTIU)
 	spreadBit30Cmp(XORI)
 	spreadBit30Cmp(SRLI)
 	spreadBit30Cmp(ORI)
