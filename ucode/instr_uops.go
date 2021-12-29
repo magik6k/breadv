@@ -32,6 +32,14 @@ const (
 	F_BLTU = 0b110
 	F_BGEU = 0b111
 
+	// FUNC SYSTEM
+	F_CSRRW = 0b001
+	F_CSRRS = 0b010
+	F_CSRRC = 0b011
+	F_CSRRWI = 0b101
+	F_CSRRSI = 0b110
+	F_CSRRCI = 0b111
+
 	BIT30 = 0b1_000_00000_00 // A10
 
 	DISCARD = 0b1_0_000_00000_00 // A11
@@ -65,6 +73,13 @@ const (
 	BGE  = (F_BGE << 7) | BRANCH
 	BLTU = (F_BLTU << 7) | BRANCH
 	BGEU = (F_BGEU << 7) | BRANCH
+
+	CSRRW = (F_CSRRW << 7) | SYSTEM
+	CSRRS = (F_CSRRS << 7) | SYSTEM
+	CSRRC = (F_CSRRC << 7) | SYSTEM
+	CSRRWI = (F_CSRRWI << 7) | SYSTEM
+	CSRRSI = (F_CSRRSI << 7) | SYSTEM
+	CSRRCI = (F_CSRRCI << 7) | SYSTEM
 )
 
 func uops1() {
@@ -105,6 +120,13 @@ func uops1() {
 
 		JALR: u_alua_pc | u_alu_add | u_rd,
 		JAL:  u_alua_pc | u_alu_add | u_rd,
+
+		CSRRW: u_alu_or | u_rd,
+		CSRRS: u_alu_or | u_rd,
+		CSRRC: u_alu_or | u_rd,
+		CSRRWI: u_alub_op0 | u_alu_or | u_rd,
+		CSRRSI: u_alub_op0 | u_alu_or | u_rd,
+		CSRRCI: u_alub_op0 | u_alu_or | u_rd,
 	}
 
 	spreadAllFunct := func(instr int) {
@@ -131,6 +153,13 @@ func uops1() {
 	spreadBit30(SRLI)
 	spreadBit30(ORI)
 	spreadBit30(ANDI)
+
+	spreadBit30(CSRRW)
+	spreadBit30(CSRRS)
+	spreadBit30(CSRRC)
+	spreadBit30(CSRRWI)
+	spreadBit30(CSRRSI)
+	spreadBit30(CSRRCI)
 
 	spreadBit30(ADD)
 	spreadBit30(SLL)
@@ -176,7 +205,9 @@ func uops2() {
 
 		u_alu_b_plus4 byte = 0b0010_0000
 
-		negated = u_mem_load_store
+		u_csr_w byte = 0b0100_0000
+
+		negated = u_mem_load_store | u_csr_w
 	)
 
 	inmap := map[int]byte{
@@ -200,6 +231,13 @@ func uops2() {
 
 		BLTU | CMP_IN: u_cmp_sig | u_cmp_lt | u_pc_op,
 		BGEU | CMP_IN: u_cmp_sig | u_cmp_lt,
+
+		CSRRW: u_csr_w,
+		/*CSRRS:
+		CSRRC:
+		CSRRWI:
+		CSRRSI:
+		CSRRCI: */
 
 		STORE: u_mem_load_store,
 		LOAD:  u_mem_load_store,
@@ -243,6 +281,13 @@ func uops2() {
 	spreadBit30Cmp(SRL)
 	spreadBit30Cmp(OR)
 	spreadBit30Cmp(AND)
+
+	spreadBit30Cmp(CSRRW)
+	spreadBit30Cmp(CSRRS)
+	spreadBit30Cmp(CSRRC)
+	spreadBit30Cmp(CSRRWI)
+	spreadBit30Cmp(CSRRSI)
+	spreadBit30Cmp(CSRRCI)
 
 	spreadAllFunct(LUI)
 	spreadAllFunct(AUIPC)
