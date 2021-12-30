@@ -3,7 +3,7 @@
 
 _start:
 	# sp setup
-	addi sp, zero, 0x1f0
+	li sp, 0x10000
 
 	call main
 end:

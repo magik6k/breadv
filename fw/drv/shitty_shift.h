@@ -1,0 +1,1 @@
+int shiftRight4(int n);

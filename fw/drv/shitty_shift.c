@@ -4,7 +4,7 @@ int ns4[] = {0x10, 0x20, 0x40, 0x80};
 int shiftRight4(int n) {
     int out = 0;
     for(int i = 0; i < 4; i++) {
-        if(n & ns4[i] > 0) {
+        if((n & ns4[i]) > 0) {
             out |= ns0[i];
         }
     }
