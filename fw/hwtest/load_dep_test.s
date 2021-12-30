@@ -3,7 +3,8 @@
 _start:
     li x1, 0x00
     li x2, 0x00
-    li x3, 0x08040201
+    #li x3, 0x08040201
+    li x3, 0xffff7fff
 
 loop:
 

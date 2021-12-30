@@ -121,7 +121,7 @@ func uops1() {
 		SLTU:  u_rd,
 
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
-		LOAD: u_alub_op0 | u_alu_add,
+		LOAD: u_alub_op0 | u_alu_add | u_rd,
 
 		JALR: u_alua_pc | u_alu_add | u_rd,
 		JAL:  u_alua_pc | u_alu_add | u_rd,
