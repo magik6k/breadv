@@ -43,7 +43,7 @@ enum state {
 
 bool mode_single = true;
 
-int i = latch_hi;
+uint8_t i = latch_hi;
 
 inline void writeb(uint8_t bit, uint8_t val) {
     if (val == LOW) {
@@ -113,22 +113,36 @@ void loop() {
   }
 
   } else {
-    int32_t d = analogRead(pin_freqmod)+1;
+    int32_t d = analogRead(pin_freqmod)-20;
+    if(d <= 0) d = 1;
+
     int32_t dus = d*d;
 
-    for(; i <= show_lo; i++) {
-        if(dus > 1024) {
-            delay(dus/1024);
-        } else {
-            delayMicroseconds(dus);
+    uint8_t j = 1;
+    if(dus == 1) {
+        for(uint8_t k = 0; k < 200; k++) {
+            for(; i <= show_lo; i++) {
+                update();
+            }
+            if(i > show_lo) {
+              i = latch_hi;
+            }
         }
+    } else {
+        for(; i <= show_lo; i++) {
+            if(dus > 1024) {
+                delay(dus/1024);
+            } else {
+                delayMicroseconds(dus);
+            }
 
-        if(digitalRead(pin_trap_enable)==0 && digitalRead(pin_trap_level) == digitalRead(pin_trap)) {
-            mode_single = true;
-            return;
+            if(digitalRead(pin_trap_enable)==0 && digitalRead(pin_trap_level) == digitalRead(pin_trap)) {
+                mode_single = true;
+                return;
+            }
+
+            update();
         }
-
-        update();
     }
   }
 
