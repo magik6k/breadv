@@ -5,8 +5,14 @@ _start:
     li x2, 0x00
     #li x3, 0x08040201
     li x3, 0xffff7fff
+    nop
+    nop
+    nop
 
 loop:
+    nop
+    nop
+    nop
 
     sw x3, 0(x1)
 
