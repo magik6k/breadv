@@ -1,11 +1,15 @@
-.section .text
+.section .boot_text
+
 .globl _start
-
 _start:
-	# sp setup
-	li sp, 0x10000
+        # sp setup
+        addi sp, zero, 0x1f0
 
-	call main
+        call main
+        j end
+
 end:
-	auipc x6, 0
-	jalr x5, x6, 0
+        auipc x6, 0
+        jalr x5, x6, 0
+
+.section .text

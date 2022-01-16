@@ -6,6 +6,7 @@ OUTPUT_ARCH( "riscv" )
  . = 0x200;
  .text :
  {
+ *(.boot_text)
  *(.text)
  }
  /* data: Initialized data segment */
