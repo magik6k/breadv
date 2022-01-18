@@ -24,7 +24,7 @@ const (
 	LUI    = 0b01101_11
 	STORE  = 0b01000_11
 
-	F_ADD  = 0b000
+	F_ADD = 0b000
 
 	ADDI = (F_ADD << 7) | ARITHI
 
@@ -42,7 +42,7 @@ func main() {
 	mode := &serial.Mode{
 		BaudRate: 115200,
 		DataBits: 8,
-		Parity: serial.OddParity,
+		Parity:   serial.OddParity,
 		StopBits: serial.OneStopBit,
 	}
 
@@ -202,7 +202,7 @@ func main() {
 	})
 
 	const (
-		ExecOne = 'X'
+		ExecOne     = 'X'
 		ExecHandoff = 'Y'
 	)
 
@@ -212,7 +212,7 @@ func main() {
 	exec = func(resp http.ResponseWriter, req *http.Request, pb string, mode byte) bool {
 		storeDiscard <<= 1
 
-		if storeDiscard & 0b1000 > 0 {
+		if storeDiscard&0b1000 > 0 {
 			// will be discarded, send nop
 			exec(resp, req, "00000013", ExecOne)
 		}
@@ -223,7 +223,7 @@ func main() {
 			return true
 		}
 
-		if instr[3] & 0x7f == STORE {
+		if instr[3]&0x7f == STORE {
 			storeDiscard |= 1
 		}
 
@@ -346,7 +346,7 @@ func main() {
 			http.Error(resp, "no body len", http.StatusUnprocessableEntity)
 			return
 		}
-		if req.ContentLength % 4 != 0 {
+		if req.ContentLength%4 != 0 {
 			http.Error(resp, "body len not multiple of 4", http.StatusUnprocessableEntity)
 			return
 		}
@@ -359,15 +359,15 @@ func main() {
 
 		// data -> []addr
 		instrs := map[int32][]int32{}
-		for i := 0; i < len(toSend); i+=4 {
+		for i := 0; i < len(toSend); i += 4 {
 
-			n := int32(toSend[i + 0])
+			n := int32(toSend[i+3])
 			n <<= 8
-			n |= int32(toSend[i + 1])
+			n |= int32(toSend[i+2])
 			n <<= 8
-			n |= int32(toSend[i + 2])
+			n |= int32(toSend[i+1])
 			n <<= 8
-			n |= int32(toSend[i + 3])
+			n |= int32(toSend[i+0])
 
 			instrs[n] = append(instrs[n], int32(i))
 		}
@@ -375,42 +375,42 @@ func main() {
 		// set addr to 0
 		at := int32(0)
 		instr := uint32(0) | RS1_X0 | RD_X2 | ADDI
-		if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+		if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 			return
 		}
 
 		for n, addrs := range instrs {
 			// set x1 (data)
 			m := (n << 20) >> 20
-			k := (n-m) >> 12
+			k := (n - m) >> 12
 
 			fmt.Printf("LOAD > %08x\n", uint32(n))
 
-			var instr = uint32(k << 12) | RD_X1 | LUI
-			if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+			var instr = uint32(k<<12) | RD_X1 | LUI
+			if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 				return
 			}
 
-			instr = uint32(m << 20) | RS1_X1 | RD_X1 | ADDI
-			if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+			instr = uint32(m<<20) | RS1_X1 | RD_X1 | ADDI
+			if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 				return
 			}
 
 			for _, addr := range addrs {
 				n := addr
 				m := (n << 20) >> 20
-				k := (n-m) >> 12
+				k := (n - m) >> 12
 
 				if k != at {
-					instr = uint32(k << 12) | RD_X2 | LUI
-					if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+					instr = uint32(k<<12) | RD_X2 | LUI
+					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 						return
 					}
 					at = k
 				}
 
-				instr = uint32((m >> 5) << 25) | RS2_X1 | RS1_X2 | uint32((m & 0b11111) << 7) | STORE
-				if exec(resp,req,fmt.Sprintf("%08x", instr), ExecOne) {
+				instr = uint32((m>>5)<<25) | RS2_X1 | RS1_X2 | uint32((m&0b11111)<<7) | STORE
+				if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 					return
 				}
 			}
