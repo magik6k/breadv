@@ -16,7 +16,12 @@ const uint8_t oen = 0b00000100;
 
 const int pin_clk = 2;
 
+const int pin_int_busy = 10;
+
 void setup() {
+
+Serial.begin(9600);
+
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, 1);
   
@@ -29,6 +34,9 @@ void setup() {
       }
     }
   }
+
+  pinMode(pin_int_busy, OUTPUT);
+  digitalWrite(pin_int_busy, LOW);
 
   // PORTF
   pinMode(A0, OUTPUT);
@@ -281,32 +289,84 @@ uint16_t reg;
 uint16_t idx;
 uint16_t i;
 
-void fclk() {
-  reg = 0;
-  
-  for(i = 3; i <= 8; i++) {
-     idx = i-3;
+uint8_t mask, shift;
 
-     if(digitalRead(i)) {        
-       reg |= (1 << idx);
-     }
-  }
+
+const uint8_t shiftLUT[8] = {
+    0x01,
+    0x02,
+    0x04,
+    0x08,
+    0x10,
+    0x20,
+    0x40,
+    0x80,
+};
+
+#define GETBIT(src, bit) (((src)&(shiftLUT[(bit)]))>>(bit))
+
+void fclk() {
+  PORTB ^= 0x10;
+
+  uint8_t A = PINA;
+  uint8_t B = PINB;
+  uint8_t C = PINC;
+  uint8_t D = PIND;
+  uint8_t G = PING;
+  uint8_t L = PINL;
+  uint8_t H = PINH;
+  uint8_t E = PINE;
+
+  reg = (GETBIT(H, 4)<<0) |
+        (GETBIT(H, 3)<<1) |
+        (GETBIT(E, 3)<<2) |
+        (GETBIT(G, 5)<<3) |
+        (GETBIT(E, 5)<<4);
 
   reg *= 32;
+  idx = reg;
 
-  if(reg < 512) {
-    for(i = 22; i < 54; i++) {
-      idx = i-22+reg;
+  mask = mask_low;
+  shift = shift_low;
 
-      pxdata[idx] = (pxdata[idx] & mask_low) | (digitalRead(i) << shift_low)&mask_g;
-    }
-  } else {
-    reg -= 512;
-
-    for(i = 22; i < 54; i++) {
-      idx = i-22+reg;
-
-      pxdata[idx] = (pxdata[idx] & mask_hi) | (digitalRead(i) << shift_hi)&mask_g;
-    }
+  if(reg >= 512) {
+    idx -= 512;
+    mask = mask_hi;
+    shift = shift_hi;
   }
+
+  pxdata[idx+0x00] = (pxdata[idx+0x00]&mask) | GETBIT(A, 0)<<shift;
+  pxdata[idx+0x01] = (pxdata[idx+0x01]&mask) | GETBIT(A, 2)<<shift;
+  pxdata[idx+0x02] = (pxdata[idx+0x02]&mask) | GETBIT(A, 4)<<shift;
+  pxdata[idx+0x03] = (pxdata[idx+0x03]&mask) | GETBIT(A, 6)<<shift;
+  pxdata[idx+0x04] = (pxdata[idx+0x04]&mask) | GETBIT(C, 7)<<shift;
+  pxdata[idx+0x05] = (pxdata[idx+0x05]&mask) | GETBIT(C, 5)<<shift;
+  pxdata[idx+0x06] = (pxdata[idx+0x06]&mask) | GETBIT(C, 3)<<shift;
+  pxdata[idx+0x07] = (pxdata[idx+0x07]&mask) | GETBIT(C, 1)<<shift;
+  pxdata[idx+0x08] = (pxdata[idx+0x08]&mask) | GETBIT(C, 0)<<shift;
+  pxdata[idx+0x09] = (pxdata[idx+0x09]&mask) | GETBIT(C, 2)<<shift;
+  pxdata[idx+0x0a] = (pxdata[idx+0x0a]&mask) | GETBIT(C, 4)<<shift;
+  pxdata[idx+0x0b] = (pxdata[idx+0x0b]&mask) | GETBIT(C, 6)<<shift;
+  pxdata[idx+0x0c] = (pxdata[idx+0x0c]&mask) | GETBIT(A, 7)<<shift;
+  pxdata[idx+0x0d] = (pxdata[idx+0x0d]&mask) | GETBIT(A, 5)<<shift;
+  pxdata[idx+0x0e] = (pxdata[idx+0x0e]&mask) | GETBIT(A, 3)<<shift;
+  pxdata[idx+0x0f] = (pxdata[idx+0x0f]&mask) | GETBIT(A, 1)<<shift;
+  pxdata[idx+0x10] = (pxdata[idx+0x10]&mask) | GETBIT(D, 7)<<shift;
+  pxdata[idx+0x11] = (pxdata[idx+0x11]&mask) | GETBIT(G, 1)<<shift;
+  pxdata[idx+0x12] = (pxdata[idx+0x12]&mask) | GETBIT(L, 7)<<shift;
+  pxdata[idx+0x13] = (pxdata[idx+0x13]&mask) | GETBIT(L, 5)<<shift;
+  pxdata[idx+0x14] = (pxdata[idx+0x14]&mask) | GETBIT(L, 3)<<shift;
+  pxdata[idx+0x15] = (pxdata[idx+0x15]&mask) | GETBIT(L, 1)<<shift;
+  pxdata[idx+0x16] = (pxdata[idx+0x16]&mask) | GETBIT(B, 3)<<shift;
+  pxdata[idx+0x17] = (pxdata[idx+0x17]&mask) | GETBIT(B, 1)<<shift;
+  pxdata[idx+0x18] = (pxdata[idx+0x18]&mask) | GETBIT(B, 0)<<shift;
+  pxdata[idx+0x19] = (pxdata[idx+0x19]&mask) | GETBIT(B, 2)<<shift;
+  pxdata[idx+0x1a] = (pxdata[idx+0x1a]&mask) | GETBIT(L, 0)<<shift;
+  pxdata[idx+0x1b] = (pxdata[idx+0x1b]&mask) | GETBIT(L, 2)<<shift;
+  pxdata[idx+0x1c] = (pxdata[idx+0x1c]&mask) | GETBIT(L, 4)<<shift;
+  pxdata[idx+0x1d] = (pxdata[idx+0x1d]&mask) | GETBIT(L, 6)<<shift;
+  pxdata[idx+0x1e] = (pxdata[idx+0x1e]&mask) | GETBIT(G, 0)<<shift;
+  pxdata[idx+0x1f] = (pxdata[idx+0x1f]&mask) | GETBIT(G, 2)<<shift;
+
+  PORTB ^= 0x10;
 }
