@@ -33,9 +33,9 @@ const (
 	F_BGEU = 0b111
 
 	// FUNC SYSTEM
-	F_CSRRW = 0b001
-	F_CSRRS = 0b010
-	F_CSRRC = 0b011
+	F_CSRRW  = 0b001
+	F_CSRRS  = 0b010
+	F_CSRRC  = 0b011
 	F_CSRRWI = 0b101
 	F_CSRRSI = 0b110
 	F_CSRRCI = 0b111
@@ -74,12 +74,18 @@ const (
 	BLTU = (F_BLTU << 7) | BRANCH
 	BGEU = (F_BGEU << 7) | BRANCH
 
-	CSRRW = (F_CSRRW << 7) | SYSTEM
-	CSRRS = (F_CSRRS << 7) | SYSTEM
-	CSRRC = (F_CSRRC << 7) | SYSTEM
+	CSRRW  = (F_CSRRW << 7) | SYSTEM
+	CSRRS  = (F_CSRRS << 7) | SYSTEM
+	CSRRC  = (F_CSRRC << 7) | SYSTEM
 	CSRRWI = (F_CSRRWI << 7) | SYSTEM
 	CSRRSI = (F_CSRRSI << 7) | SYSTEM
 	CSRRCI = (F_CSRRCI << 7) | SYSTEM
+
+	// alu uops1->uops3
+	A_ADD = 0b0001
+	A_OR  = 0b0010
+	A_XOR = 0b0011
+	A_AND = 0b0100
 )
 
 func uops1() {
@@ -90,16 +96,16 @@ func uops1() {
 		u_alua_pc  byte = 0b0000_0001 // a=op1 otherwise
 		u_alub_op0 byte = 0b0000_0010 // b=op2 otherwise
 
-		u_alu_add byte = 0b0000_0100
-		u_alu_or  byte = 0b0000_1000
-		u_alu_xor byte = 0b0001_0000
-		u_alu_and byte = 0b0010_0000
+		u_alu_add byte = A_ADD << 2
+		u_alu_or  byte = A_OR << 2
+		u_alu_xor byte = A_XOR << 2
+		u_alu_and byte = A_AND << 2
 
 		u_mem_store byte = 0b0100_0000
 
 		u_rd byte = 0b1000_0000
 
-		negated = u_alua_pc | u_alub_op0 | u_alu_add | u_alu_or | u_alu_xor | u_alu_and | u_rd
+		negated = u_alua_pc | u_alub_op0 | u_rd
 	)
 
 	inmap := map[int]byte{
@@ -121,14 +127,14 @@ func uops1() {
 		SLTU:  u_rd,
 
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
-		LOAD: u_alub_op0 | u_alu_add | u_rd,
+		LOAD:  u_alub_op0 | u_alu_add | u_rd,
 
 		JALR: u_alua_pc | u_alu_add | u_rd,
 		JAL:  u_alua_pc | u_alu_add | u_rd,
 
-		CSRRW: u_alu_or | u_rd,
-		CSRRS: u_alu_or | u_rd,
-		CSRRC: u_alu_or | u_rd,
+		CSRRW:  u_alu_or | u_rd,
+		CSRRS:  u_alu_or | u_rd,
+		CSRRC:  u_alu_or | u_rd,
 		CSRRWI: u_alub_op0 | u_alu_or | u_rd,
 		CSRRSI: u_alub_op0 | u_alu_or | u_rd,
 		CSRRCI: u_alub_op0 | u_alu_or | u_rd,
@@ -328,7 +334,37 @@ func uops2() {
 	}
 }
 
+func uops3() {
+	const size = 0x2000
+	var out [size]byte
+
+	var (
+		u_alu_add byte = 0b00000001
+		u_alu_and byte = 0b00000010
+		u_alu_or  byte = 0b00000100
+		u_alu_xor byte = 0b00001000
+
+		negated = u_alu_add | u_alu_or | u_alu_xor | u_alu_and
+	)
+
+	inmap := map[int]byte{
+		A_ADD << 8: u_alu_add,
+		A_OR << 8:  u_alu_or,
+		A_XOR << 8: u_alu_xor,
+		A_AND << 8: u_alu_and,
+	}
+
+	for i := range out {
+		out[i] = inmap[i] ^ negated
+	}
+
+	if err := ioutil.WriteFile("instr_uops3.bin", out[:], 0664); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	uops1()
 	uops2()
+	uops3()
 }
