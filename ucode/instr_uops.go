@@ -65,7 +65,7 @@ const (
 	SRLI  = (F_SRL << 7) | ARITHI
 	ORI   = (F_OR << 7) | ARITHI
 	ANDI  = (F_AND << 7) | ARITHI
-	// SRAI?
+	SRAI  = SRLI | BIT30
 
 	BEQ  = (F_BEQ << 7) | BRANCH
 	BNE  = (F_BNE << 7) | BRANCH
@@ -86,6 +86,10 @@ const (
 	A_OR  = 0b0010
 	A_XOR = 0b0011
 	A_AND = 0b0100
+
+	A_SLL = 0b0101
+	A_SRL = 0b0110
+	A_SRA = 0b0111
 )
 
 func uops1() {
@@ -100,6 +104,10 @@ func uops1() {
 		u_alu_or  byte = A_OR << 2
 		u_alu_xor byte = A_XOR << 2
 		u_alu_and byte = A_AND << 2
+
+		u_alu_sll byte = A_SLL << 2
+		u_alu_srl byte = A_SRL << 2
+		u_alu_sra byte = A_SRA << 2
 
 		u_mem_store byte = 0b0100_0000
 
@@ -125,6 +133,13 @@ func uops1() {
 		SLTIU: u_alub_op0 | u_rd,
 		SLT:   u_rd,
 		SLTU:  u_rd,
+
+		SLL:  u_rd | u_alu_sll,
+		SLLI: u_alub_op0 | u_rd | u_alu_sll,
+		SRL:  u_rd | u_alu_srl,
+		SRLI: u_alub_op0 | u_rd | u_alu_srl,
+		SRA:  u_rd | u_alu_sra,
+		SRAI: u_alub_op0 | u_rd | u_alu_sra,
 
 		STORE: u_mem_store | u_alub_op0 | u_alu_add,
 		LOAD:  u_alub_op0 | u_alu_add | u_rd,
@@ -156,12 +171,17 @@ func uops1() {
 		inmap[instr|BIT30|CMP_IN] = inmap[instr]
 	}
 
+	inmap[SLL|CMP_IN] = inmap[SLL]
+	inmap[SLLI|CMP_IN] = inmap[SLLI]
+	inmap[SRL|CMP_IN] = inmap[SRL]
+	inmap[SRLI|CMP_IN] = inmap[SRLI]
+	inmap[SRA|CMP_IN] = inmap[SRA]
+	inmap[SRAI|CMP_IN] = inmap[SRAI]
+
 	spreadBit30(ADDI)
-	spreadBit30(SLLI)
 	spreadBit30(SLTI)
 	spreadBit30(SLTIU)
 	spreadBit30(XORI)
-	spreadBit30(SRLI)
 	spreadBit30(ORI)
 	spreadBit30(ANDI)
 
@@ -173,11 +193,9 @@ func uops1() {
 	spreadBit30(CSRRCI)
 
 	spreadBit30(ADD)
-	spreadBit30(SLL)
 	spreadBit30(SLT)
 	spreadBit30(SLTU)
 	spreadBit30(XOR)
-	spreadBit30(SRL)
 	spreadBit30(OR)
 	spreadBit30(AND)
 
@@ -339,12 +357,16 @@ func uops3() {
 	var out [size]byte
 
 	var (
-		u_alu_add byte = 0b00000001
-		u_alu_and byte = 0b00000010
-		u_alu_or  byte = 0b00000100
-		u_alu_xor byte = 0b00001000
+		u_alu_add byte = 0b0000_0001
+		u_alu_and byte = 0b0000_0010
+		u_alu_or  byte = 0b0000_0100
+		u_alu_xor byte = 0b0000_1000
 
-		negated = u_alu_add | u_alu_or | u_alu_xor | u_alu_and
+		u_sh_str  byte = 0b0001_0000
+		u_sh_flip byte = 0b0010_0000
+		u_sh_ext  byte = 0b0100_0000
+
+		negated = u_alu_add | u_alu_or | u_alu_xor | u_alu_and | u_sh_str | u_sh_flip
 	)
 
 	inmap := map[int]byte{
@@ -352,6 +374,10 @@ func uops3() {
 		A_OR << 8:  u_alu_or,
 		A_XOR << 8: u_alu_xor,
 		A_AND << 8: u_alu_and,
+
+		A_SLL << 8: u_sh_str,
+		A_SRL << 8: u_sh_flip,
+		A_SRA << 8: u_sh_flip | u_sh_ext,
 	}
 
 	for i := range out {
