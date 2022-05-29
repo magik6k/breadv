@@ -36,7 +36,7 @@ _start:
         li x31,0
 
         # sp setup
-        addi sp, zero, 0x1f0
+        li sp, 0x10000
 
         call main
         j end

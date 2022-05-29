@@ -1,5 +1,5 @@
 #include "gpio.h"
-#include "shitty_shift.h"
+#include <stdint.h>
 
 #define LCD_E  0x20
 #define LCD_RS 0x10
@@ -43,7 +43,7 @@ static void send_half(int d, int sys) {
 }
 
 static void send_byte(int d, int sys) {
-    send_half(shiftRight4(d & 0xf0), sys);
+    send_half((d & 0xf0)>>4, sys);
     send_half(d & 0x0f, sys);
 }
 
@@ -60,11 +60,13 @@ void lcd_init() {
     send_byte(LCD_CLEAR, CMD);
     //send_byte(LCDC_ENTRY_MODE | LCD_EM_SHIFT_CURSOR | LCD_EM_RIGHT, CMD);
 
-    send_byte('B', CHR);
-    send_byte('r', CHR);
-    send_byte('e', CHR);
-    send_byte('a', CHR);
-    send_byte('d', CHR);
-    send_byte('V', CHR);
+//    send_byte('B', CHR);
+
+}
+
+void lcd_puts(const uint32_t* s) {
+    for(int i=0;s[i]!='\0';s++) {
+        send_byte(s[i], CHR);
+    }
 }
 

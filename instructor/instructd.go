@@ -386,6 +386,22 @@ func main() {
 
 			fmt.Printf("LOAD > %08x\n", uint32(n))
 
+			/*
+				for i := uint32(0); i < 32; i++ {
+					fmt.Println("\nLUI ", i)
+					var instr = uint32(k<<12) | (RD_X1 * i) | LUI
+					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
+						return
+					}
+
+					fmt.Println("\nADD", i)
+					instr = uint32(m<<20) | (RS1_X1 * i) | (RD_X1 * i) | ADDI
+					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
+						return
+					}
+				}
+			*/
+
 			var instr = uint32(k<<12) | RD_X1 | LUI
 			if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 				return
@@ -415,6 +431,58 @@ func main() {
 				}
 			}
 		}
+
+		/*	var toSendi []int32
+			for i := 0; i < len(toSend); i += 4 {
+
+				n := int32(toSend[i+3])
+				n <<= 8
+				n |= int32(toSend[i+2])
+				n <<= 8
+				n |= int32(toSend[i+1])
+				n <<= 8
+				n |= int32(toSend[i+0])
+
+				toSendi = append(toSendi, n)
+			}
+
+			for addr, n := range toSendi {
+				// set x1 (data)
+				m := (n << 20) >> 20
+				k := (n - m) >> 12
+
+				fmt.Printf("LOAD > %08x\n", uint32(n))
+
+				var instr = uint32(k<<12) | RD_X1 | LUI
+				if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+
+				instr = uint32(m<<20) | RS1_X1 | RD_X1 | ADDI
+				if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
+					return
+				}
+
+				{
+					n := int32(addr)
+					m := (n << 20) >> 20
+					k := (n - m) >> 12
+
+					if k != at {
+						instr = uint32(k<<12) | RD_X2 | LUI
+						if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
+							return
+						}
+						at = k
+					}
+
+					instr = uint32((m>>5)<<25) | RS2_X1 | RS1_X2 | uint32((m&0b11111)<<7) | STORE
+					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
+						return
+					}
+				}
+
+			}*/
 
 		if err := ping(); err != nil {
 			http.Error(resp, fmt.Errorf("ping error: %w", err).Error(), http.StatusBadGateway)

@@ -1,7 +1,7 @@
 const int text_cap = 1000;
 volatile unsigned char text[text_cap];
 
-volatile unsigned char ex_temp[4];
+volatile unsigned char ex_temp[8];
 volatile bool run_temp = false;
 volatile bool toggle_handoff = false;
 volatile bool in_handoff = false;
@@ -85,7 +85,7 @@ void setup() {
   putWord(0);
   
   pinMode(clock_pin, INPUT);  
-  attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
+  attachInterrupt(digitalPinToInterrupt(clock_pin), clk, CHANGE);
 
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200, SERIAL_8O1);
@@ -177,30 +177,34 @@ void loop() {
     break;
     case 'Y': // handoff
     case 'X': // execute
-        detachInterrupt(digitalPinToInterrupt(clock_pin));
         setupNop();
         run_temp = false;
 
-        Serial.write('R');
+        Serial.write('R'); // read
 
         while(Serial.available() == 0);
-        ex_temp[3] = Serial.read();
+        ex_temp[7] = Serial.read();
         while(Serial.available() == 0);
-        ex_temp[2] = Serial.read();
+        ex_temp[6] = Serial.read();
         while(Serial.available() == 0);
-        ex_temp[1] = Serial.read();
+        ex_temp[5] = Serial.read();
         while(Serial.available() == 0);
-        ex_temp[0] = Serial.read();
+        ex_temp[4] = Serial.read();
 
-        attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
+        Serial.write('A'); // read ack
 
-        Serial.write('A');
+        // wait for low clock
+        while(digitalRead(clock_pin));
 
+        ex_temp[0] = ex_temp[4];
+        ex_temp[1] = ex_temp[5];
+        ex_temp[2] = ex_temp[6];
+        ex_temp[3] = ex_temp[7];
         toggle_handoff = sb == 'Y';
         run_temp = true;
 
         while(run_temp || toggle_handoff);
-        Serial.write('D');
+        Serial.write('D'); // exec ack
 
         if(sb == 'Y') {
             mode = 'Y';
@@ -222,7 +226,6 @@ void loop() {
     /* uint32_t cs = crc.calc(text, at);
     Serial.write(); */
     at = 0;
-    attachInterrupt(digitalPinToInterrupt(clock_pin), clk, RISING);
     mode = 'W';
   break;
   case 'Y':
@@ -241,8 +244,12 @@ void loop() {
   }
 }
 
-
 void clk() {
+  bool pin = digitalRead(clock_pin);
+  if(!pin) {
+    return;
+  }
+
   if(in_handoff) {
     if(!toggle_handoff) {
         return;
