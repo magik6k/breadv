@@ -90,6 +90,8 @@ const (
 	A_SLL = 0b0101
 	A_SRL = 0b0110
 	A_SRA = 0b0111
+
+	A_SUB = 0b1000
 )
 
 func uops1() {
@@ -101,6 +103,7 @@ func uops1() {
 		u_alub_op0 byte = 0b0000_0010 // b=op2 otherwise
 
 		u_alu_add byte = A_ADD << 2
+		u_alu_sub byte = A_SUB << 2
 		u_alu_or  byte = A_OR << 2
 		u_alu_xor byte = A_XOR << 2
 		u_alu_and byte = A_AND << 2
@@ -128,6 +131,8 @@ func uops1() {
 		ORI:  u_alub_op0 | u_alu_or | u_rd,
 		AND:  u_alu_and | u_rd,
 		ANDI: u_alub_op0 | u_alu_and | u_rd,
+
+		SUB: u_alu_sub | u_rd,
 
 		SLTI:  u_alub_op0 | u_rd,
 		SLTIU: u_alub_op0 | u_rd,
@@ -192,7 +197,6 @@ func uops1() {
 	spreadBit30(CSRRSI)
 	spreadBit30(CSRRCI)
 
-	spreadBit30(ADD)
 	spreadBit30(SLT)
 	spreadBit30(SLTU)
 	spreadBit30(XOR)
@@ -366,6 +370,8 @@ func uops3() {
 		u_sh_flip byte = 0b0010_0000
 		u_sh_ext  byte = 0b0100_0000
 
+		u_alu_negb byte = 0b1000_0000
+
 		negated = u_alu_add | u_alu_or | u_alu_xor | u_alu_and | u_sh_str | u_sh_flip
 	)
 
@@ -378,6 +384,8 @@ func uops3() {
 		A_SLL << 8: u_sh_str,
 		A_SRL << 8: u_sh_flip,
 		A_SRA << 8: u_sh_flip | u_sh_ext,
+
+		A_SUB << 8: u_alu_add | u_alu_negb,
 	}
 
 	for i := range out {

@@ -19,11 +19,11 @@ int main(void) {
         x = y * x;
         y = x / (y*345);
 */
-/*
-        uint32_t buf[20];*/
+
+        uint32_t buf[20];
 
         lcd_puts(U"prints");
-        //lcd_puts(itoa32(420, buf, 10));
+        lcd_puts(itoa32(420, buf, 10));
 
         return 0;
 }
