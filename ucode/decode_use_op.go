@@ -7,12 +7,17 @@ func main() {
 	var out [size]byte
 
 	var (
+		id_A  byte = 0b0001
+		id_B  byte = 0b0010
+		id_Ub byte = 0b0100
+		id_Mb byte = 0b1000
+
 		// out
-		op_I byte = 0b00001_000
-		op_S byte = 0b00010_000
-		op_B byte = 0b00100_000
-		op_U byte = 0b01000_000
-		op_J byte = 0b10000_000
+		op_I byte = (id_Ub | id_Mb | 0) << 3
+		op_S byte = (id_Ub | id_Mb | id_A) << 3
+		op_B byte = (id_Ub | id_Mb | id_A | id_B) << 3
+		op_J byte = (id_Ub | id_B) << 3
+		op_U byte = (0) << 3
 
 		rs1_disable byte = 0b00000_001
 		rs2_disable byte = 0b00000_010
