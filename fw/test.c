@@ -23,11 +23,11 @@ int main(void) {
         uint32_t buf[20];
 
         lcd_puts(U"prints");
-        lcd_puts(itoa32(420, buf, 10));
+        //lcd_puts(itoa32(420, buf, 10));
 
         return 0;
 }
-
+/*
 uint32_t* itoa32(int value, uint32_t* result, int base) {
     // check that the base if valid
     if (base < 2 || base > 36) { *result = '\0'; return result; }
@@ -51,3 +51,4 @@ uint32_t* itoa32(int value, uint32_t* result, int base) {
     }
     return result;
 }
+*/
