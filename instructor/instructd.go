@@ -4,13 +4,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 	"sync"
 	"time"
 
@@ -88,118 +86,6 @@ func main() {
 	}
 
 	var hndlk sync.Mutex
-
-	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
-		hndlk.Lock()
-		defer hndlk.Unlock()
-
-		if req.ContentLength < 1 {
-			http.Error(resp, "no body len", http.StatusUnprocessableEntity)
-			return
-		}
-		if req.ContentLength > maxlen {
-			http.Error(resp, "body too chubby", http.StatusRequestEntityTooLarge)
-			return
-		}
-
-		lis := req.Header.Get("X-LastI")
-		if lis == "" {
-			http.Error(resp, "No X-LastI", http.StatusTeapot)
-			return
-		}
-
-		li, err := strconv.ParseInt(lis, 16, 16)
-		if err != nil {
-			http.Error(resp, "parsing last instr idx fail", http.StatusTeapot)
-			return
-		}
-		li = li - 0x200 + 4
-
-		var buf [maxlen]byte
-		n, err := req.Body.Read(buf[:])
-		if err != nil && err != io.EOF {
-			http.Error(resp, fmt.Sprintf("read body err: %s", err), http.StatusUnprocessableEntity)
-			return
-		}
-
-		if int64(n) != req.ContentLength {
-			http.Error(resp, "body len didn't match content len", http.StatusTeapot)
-			return
-		}
-
-		if err := ping(); err != nil {
-			http.Error(resp, fmt.Errorf("ping error: %w", err).Error(), http.StatusBadGateway)
-			return
-		}
-
-		_, err = port.Write([]byte{'T'})
-		if err != nil {
-			http.Error(resp, fmt.Errorf("start transfer: %w", err).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		var readBuf [1]byte
-		_, err = port.Read(readBuf[:])
-		if err != nil {
-			http.Error(resp, fmt.Errorf("start transfer ack: %w", err).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		if readBuf[0] != 'B' {
-			http.Error(resp, fmt.Errorf("bad start transfer resp: %x", readBuf[0]).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, err = port.Write([]byte{byte(req.ContentLength & 0xff), byte((req.ContentLength >> 8) & 0xff)})
-		if err != nil {
-			http.Error(resp, fmt.Errorf("start transfer: %w", err).Error(), http.StatusInternalServerError)
-			return
-		}
-		_, err = port.Write([]byte{byte(li & 0xff), byte((li >> 8) & 0xff)})
-		if err != nil {
-			http.Error(resp, fmt.Errorf("start transfer: %w", err).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, err = port.Read(readBuf[:])
-		if err != nil {
-			http.Error(resp, fmt.Errorf("start transfer ack: %w", err).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		if readBuf[0] != 'A' {
-			http.Error(resp, fmt.Errorf("bad len ack: %x", readBuf[0]).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for i := 0; i < n; i++ {
-			fmt.Printf("\rWrite %d (%02x)", i, buf[i])
-			_, err = port.Write([]byte{buf[i]})
-			if err != nil {
-				http.Error(resp, fmt.Errorf("transfer: %w", err).Error(), http.StatusInternalServerError)
-				return
-			}
-			_, err = port.Read(readBuf[:])
-			if err != nil {
-				http.Error(resp, fmt.Errorf("start transfer ack: %w", err).Error(), http.StatusInternalServerError)
-				return
-			}
-
-			if readBuf[0] != 'D' {
-				http.Error(resp, fmt.Errorf("bad data ack: %x", readBuf[0]).Error(), http.StatusInternalServerError)
-				return
-			}
-		}
-
-		fmt.Printf("\rWrite ok                     \n")
-
-		if err := ping(); err != nil {
-			http.Error(resp, fmt.Errorf("ping error: %w", err).Error(), http.StatusBadGateway)
-			return
-		}
-
-		resp.WriteHeader(http.StatusOK)
-	})
 
 	const (
 		ExecOne     = 'X'
@@ -386,22 +272,6 @@ func main() {
 
 			fmt.Printf("LOAD > %08x\n", uint32(n))
 
-			/*
-				for i := uint32(0); i < 32; i++ {
-					fmt.Println("\nLUI ", i)
-					var instr = uint32(k<<12) | (RD_X1 * i) | LUI
-					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
-						return
-					}
-
-					fmt.Println("\nADD", i)
-					instr = uint32(m<<20) | (RS1_X1 * i) | (RD_X1 * i) | ADDI
-					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
-						return
-					}
-				}
-			*/
-
 			var instr = uint32(k<<12) | RD_X1 | LUI
 			if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 				return
@@ -431,58 +301,6 @@ func main() {
 				}
 			}
 		}
-
-		/*	var toSendi []int32
-			for i := 0; i < len(toSend); i += 4 {
-
-				n := int32(toSend[i+3])
-				n <<= 8
-				n |= int32(toSend[i+2])
-				n <<= 8
-				n |= int32(toSend[i+1])
-				n <<= 8
-				n |= int32(toSend[i+0])
-
-				toSendi = append(toSendi, n)
-			}
-
-			for addr, n := range toSendi {
-				// set x1 (data)
-				m := (n << 20) >> 20
-				k := (n - m) >> 12
-
-				fmt.Printf("LOAD > %08x\n", uint32(n))
-
-				var instr = uint32(k<<12) | RD_X1 | LUI
-				if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
-					return
-				}
-
-				instr = uint32(m<<20) | RS1_X1 | RD_X1 | ADDI
-				if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
-					return
-				}
-
-				{
-					n := int32(addr)
-					m := (n << 20) >> 20
-					k := (n - m) >> 12
-
-					if k != at {
-						instr = uint32(k<<12) | RD_X2 | LUI
-						if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
-							return
-						}
-						at = k
-					}
-
-					instr = uint32((m>>5)<<25) | RS2_X1 | RS1_X2 | uint32((m&0b11111)<<7) | STORE
-					if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
-						return
-					}
-				}
-
-			}*/
 
 		if err := ping(); err != nil {
 			http.Error(resp, fmt.Errorf("ping error: %w", err).Error(), http.StatusBadGateway)
