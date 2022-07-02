@@ -1,9 +1,13 @@
-const int text_cap = 1000;
-
 volatile unsigned char ex_temp[8];
 volatile bool run_temp = false;
 volatile bool toggle_handoff = false;
 volatile bool in_handoff = false;
+
+volatile bool start_dumping = false;
+volatile bool dumping = false;
+volatile bool dump_next = false;
+volatile bool dump_done = false;
+volatile int32_t to_dump = 0;
 
 inline void putTemp() {
 
@@ -41,6 +45,7 @@ inline void putNop() {
 
 int clock_pin = 2;
 int handoff_pin = 3;
+int dump_pin = 4;
 
 void setupNop() {
     ex_temp[0x0] = 0x13;
@@ -56,6 +61,10 @@ void setupNop() {
 void setupOutput() {
     in_handoff = false;
     digitalWrite(handoff_pin, HIGH);
+
+    dumping = false;
+    digitalWrite(dump_pin, HIGH);
+
     for(int i = 22; i < 54; i++) {
         pinMode(i, OUTPUT);
     }
@@ -70,13 +79,15 @@ void setupHandoff() {
 }
 
 void setup() {
-  pinMode(handoff_pin, OUTPUT);
+  pinMode(dump_pin, OUTPUT);
+  digitalWrite(dump_pin, HIGH);
 
+  pinMode(handoff_pin, OUTPUT);
   setupOutput();
 
   setupNop();
   putTemp();
-  
+
   pinMode(clock_pin, INPUT);  
   attachInterrupt(digitalPinToInterrupt(clock_pin), clk, CHANGE);
 
@@ -104,12 +115,16 @@ Serial example
 
 > P - ping
 < P - pong, exit handoff
+
+> D - dump data
+> [4b len]
+<< [4x len bytes]
+
 */
 
 // W = wait
 // Y = yield execution
 char mode = 'W';
-uint16_t to_recv;
 
 void loop() {
   if (Serial.available() == 0) {
@@ -159,6 +174,60 @@ void loop() {
             mode = 'Y';
         }
       break;
+    case 'D': // dump
+        dumping = false; // sanity
+        run_temp = false;
+
+        // get len to dump
+        to_dump = 0;
+
+        while(Serial.available() == 0);
+        to_dump += Serial.read();
+        to_dump <<= 8;
+        while(Serial.available() == 0);
+        to_dump += Serial.read();
+        to_dump <<= 8;
+        while(Serial.available() == 0);
+        to_dump += Serial.read();
+        to_dump <<= 8;
+        while(Serial.available() == 0);
+        to_dump += Serial.read();
+
+        // send jalr zero, 0x0(x0); 00000067
+
+        // wait for low clock
+        while(digitalRead(clock_pin));
+
+        ex_temp[0x0] = 0x67;
+        ex_temp[0x1] = 0x00;
+        ex_temp[0x2] = 0x00;
+        ex_temp[0x3] = 0x00;
+
+        start_dumping = true;
+        toggle_handoff = true;
+        run_temp = true;
+
+        while(start_dumping || dumping) {
+            while(!dump_next && !dump_done);
+            dump_next = false;
+
+            unsigned char buf[4] = {0, 0, 0, 0};
+            for(int i = 22; i < 54; i++) {
+               int idx = i-22;
+               buf[(idx>>3)] |= (digitalRead(i) << (idx & 0x7));
+            }
+
+            Serial.write(buf[0]);
+            Serial.write(buf[1]);
+            Serial.write(buf[2]);
+            Serial.write(buf[3]);
+
+            if(dump_done) {
+                break;
+            }
+
+        }
+    break;
     default:
       Serial.write('?');
     }
@@ -187,6 +256,24 @@ void clk() {
 
   if(in_handoff) {
     if(!toggle_handoff) {
+        if(dumping && !start_dumping) {
+            digitalWrite(dump_pin, LOW);
+        }
+
+        if(start_dumping) {
+            start_dumping = false;
+            dumping = true;
+        }
+
+        if(dumping) {
+            if(to_dump <= 0) {
+                dump_done = true;
+                return;
+            }
+            to_dump--;
+            dump_next = true;
+        }
+
         return;
     }
 

@@ -4,11 +4,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"sync"
 	"time"
 
@@ -308,6 +310,46 @@ func main() {
 		}
 
 		resp.WriteHeader(http.StatusOK)
+	})
+
+	http.HandleFunc("/dump/", func(resp http.ResponseWriter, req *http.Request) {
+		hndlk.Lock()
+		defer hndlk.Unlock()
+
+		if err := ping(); err != nil {
+			http.Error(resp, fmt.Errorf("ping error: %w", err).Error(), http.StatusBadGateway)
+			return
+		}
+
+		lstr := path.Base(req.URL.Path)
+		l, err := strconv.ParseInt(lstr, 0, 32)
+		if err != nil {
+			http.Error(resp, fmt.Errorf("parse len: %w", err).Error(), http.StatusBadGateway)
+			return
+		}
+		if l%4 != 0 {
+			http.Error(resp, "len must be divisible by 4", http.StatusBadGateway)
+			return
+		}
+
+		_, err = port.Write([]byte{'D', byte((l >> 24) & 0xff), byte((l >> 16) & 0xff), byte((l >> 8) & 0xff), byte((l >> 0) & 0xff)})
+		if err != nil {
+			http.Error(resp, fmt.Errorf("start exec: %w", err).Error(), http.StatusInternalServerError)
+			return
+		}
+
+		resp.WriteHeader(http.StatusOK)
+
+		_, err = io.CopyBuffer(resp, io.LimitReader(port, l), make([]byte, 1))
+		if err != nil {
+			fmt.Println("DUMP ERR: ", err)
+			return
+		}
+
+		if err := ping(); err != nil {
+			fmt.Println("DUMP ERR: ", err)
+			return
+		}
 	})
 
 	if err := http.ListenAndServe("127.0.0.1:13333", http.DefaultServeMux); err != nil {

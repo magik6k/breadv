@@ -212,9 +212,9 @@ func uops1() {
 
 	for i := range out {
 		if i&DISCARD > 0 {
-			out[i] = u_alu_add ^ negated
+			out[i] = inmap[i^DISCARD] ^ negated
 		} else {
-			out[i] = inmap[i] ^ negated
+			out[i] = u_alu_add ^ negated
 		}
 	}
 
@@ -345,9 +345,9 @@ func uops2() {
 
 	for i := range out {
 		if i&DISCARD > 0 {
-			out[i] = negated
+			out[i] = inmap[i^DISCARD] ^ negated
 		} else {
-			out[i] = inmap[i] ^ negated
+			out[i] = negated
 		}
 	}
 
