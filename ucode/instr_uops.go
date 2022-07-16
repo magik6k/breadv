@@ -176,6 +176,9 @@ func uops1() {
 		inmap[instr|BIT30|CMP_IN] = inmap[instr]
 	}
 
+	inmap[ADD|CMP_IN] = inmap[ADD]
+	inmap[SUB|CMP_IN] = inmap[SUB]
+
 	inmap[SLL|CMP_IN] = inmap[SLL]
 	inmap[SLLI|CMP_IN] = inmap[SLLI]
 	inmap[SRL|CMP_IN] = inmap[SRL]
