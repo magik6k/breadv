@@ -15,3 +15,11 @@ loop:
     mv x0, x3
     j loop
     nop
+
+
+    #                 0110011
+    a987  000
+
+    a10 0 b30
+    a11 1 dsc
+    a12 1ish

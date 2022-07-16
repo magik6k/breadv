@@ -7,15 +7,20 @@ _start:
         nop
         call reset
 
-        // sp setup
+        # sp setup
         li sp, 0x10000
 
-        call main
+
+
         j end
 
 end:
         auipc x6, 0
         jalr x5, x6, 0
+        j end
+        j end
+        j end
+        j end
 
 reset:
     li x0,0
@@ -52,4 +57,33 @@ reset:
     ret
 
 .section .text
+
+# T3-T6 reverved for tests
+# T6 = testID
+
+# test 0x01
+test_adds:
+    li t6, 0x1001
+
+    li a0, 0x10
+    li a1, 0x10
+
+    add a1, a1, a0
+    add a1, a1, a0
+    add a1, a1, a0
+    add a1, a1, a0
+    add a1, a1, a0
+    add a1, a1, a0
+    add a1, a1, a0
+
+    li a3, 0x80
+
+    bne a1, a3, end
+
+test_bnz:
+
+test_done:
+    li t6, 0xffff
+    j end
+
 
