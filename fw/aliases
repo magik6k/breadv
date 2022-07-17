@@ -1,0 +1,35 @@
+# eval "$(cat ./aliases)"
+
+function add() { ./exec_one.sh "add $(echo $@)"; }
+function sll() { ./exec_one.sh "sll $(echo $@)"; }
+function slt() { ./exec_one.sh "slt $(echo $@)"; }
+function sltu() { ./exec_one.sh "sltu $(echo $@)"; }
+function xor() { ./exec_one.sh "xor $(echo $@)"; }
+function srl() { ./exec_one.sh "srl $(echo $@)"; }
+function or() { ./exec_one.sh "or $(echo $@)"; }
+function and() { ./exec_one.sh "and $(echo $@)"; }
+function sub() { ./exec_one.sh "sub $(echo $@)"; }
+function sra() { ./exec_one.sh "sra $(echo $@)"; }
+function addi() { ./exec_one.sh "addi $(echo $@)"; }
+function slli() { ./exec_one.sh "slli $(echo $@)"; }
+function slti() { ./exec_one.sh "slti $(echo $@)"; }
+function sltiu() { ./exec_one.sh "sltiu $(echo $@)"; }
+function xori() { ./exec_one.sh "xori $(echo $@)"; }
+function srli() { ./exec_one.sh "srli $(echo $@)"; }
+function ori() { ./exec_one.sh "ori $(echo $@)"; }
+function andi() { ./exec_one.sh "andi $(echo $@)"; }
+function srai() { ./exec_one.sh "srai $(echo $@)"; }
+function beq() { ./exec_one.sh "beq $(echo $@)"; }
+function bne() { ./exec_one.sh "bne $(echo $@)"; }
+function blt() { ./exec_one.sh "blt $(echo $@)"; }
+function bge() { ./exec_one.sh "bge $(echo $@)"; }
+function bltu() { ./exec_one.sh "bltu $(echo $@)"; }
+function bgeu() { ./exec_one.sh "bgeu $(echo $@)"; }
+function csrrw() { ./exec_one.sh "csrrw $(echo $@)"; }
+function csrrs() { ./exec_one.sh "csrrs $(echo $@)"; }
+function csrrc() { ./exec_one.sh "csrrc $(echo $@)"; }
+function csrrwi() { ./exec_one.sh "csrrwi $(echo $@)"; }
+function csrrsi() { ./exec_one.sh "csrrsi $(echo $@)"; }
+function csrrci() { ./exec_one.sh "csrrci $(echo $@)"; }
+
+function li() { ./exec_one.sh "li $(echo $@)"; }
