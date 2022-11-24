@@ -24,9 +24,13 @@ const (
 	LUI    = 0b01101_11
 	STORE  = 0b01000_11
 
+	F_SW = 0b010
+
+	SW = (F_SW << 12) | STORE
+
 	F_ADD = 0b000
 
-	ADDI = (F_ADD << 7) | ARITHI
+	ADDI = (F_ADD << 12) | ARITHI
 
 	RS1_X0 = 0b00000_000_00000_00000_00
 	RS1_X1 = 0b00001_000_00000_00000_00
@@ -297,10 +301,15 @@ func main() {
 					at = k
 				}
 
-				instr = uint32((m>>5)<<25) | RS2_X1 | RS1_X2 | uint32((m&0b11111)<<7) | STORE
+				instr = uint32((m>>5)<<25) | RS2_X1 | RS1_X2 | uint32((m&0b11111)<<7) | SW
 				if exec(resp, req, fmt.Sprintf("%08x", instr), ExecOne) {
 					return
 				}
+				/*
+					exec(resp, req, "00000013", ExecOne)
+					exec(resp, req, "00000013", ExecOne)
+					exec(resp, req, "00000013", ExecOne)
+				*/
 			}
 		}
 

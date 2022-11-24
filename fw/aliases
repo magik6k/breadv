@@ -1,5 +1,7 @@
 # eval "$(cat ./aliases)"
 
+function lui() { ./exec_one.sh "lui $(echo $@)"; }
+
 function add() { ./exec_one.sh "add $(echo $@)"; }
 function sll() { ./exec_one.sh "sll $(echo $@)"; }
 function slt() { ./exec_one.sh "slt $(echo $@)"; }
@@ -31,5 +33,14 @@ function csrrc() { ./exec_one.sh "csrrc $(echo $@)"; }
 function csrrwi() { ./exec_one.sh "csrrwi $(echo $@)"; }
 function csrrsi() { ./exec_one.sh "csrrsi $(echo $@)"; }
 function csrrci() { ./exec_one.sh "csrrci $(echo $@)"; }
+
+function sw() { ./exec_one.sh "sw $(echo $@)"; }
+function lw() { ./exec_one.sh "lw $(echo $@)"; }
+function sh() { ./exec_one.sh "sh $(echo $@)"; }
+function lh() { ./exec_one.sh "lh $(echo $@)"; }
+function sb() { ./exec_one.sh "sb $(echo $@)"; }
+function lb() { ./exec_one.sh "lb $(echo $@)"; }
+function lhu() { ./exec_one.sh "lhu $(echo $@)"; }
+function lbu() { ./exec_one.sh "lbu $(echo $@)"; }
 
 function li() { ./exec_one.sh "li $(echo $@)"; }

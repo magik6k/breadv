@@ -20,17 +20,18 @@ int main(void) {
         y = x / (y*345);
 */
 
-        uint32_t buf[20];
+        uint32_t buf[20] = U"prints";
 
-        lcd_puts(U"prints");
-        //lcd_puts(itoa32(420, buf, 10));
+        lcd_puts(buf);
+        itoa32(420, buf, 10);
+        lcd_puts(buf);
 
         return 0;
 }
-/*
+
 uint32_t* itoa32(int value, uint32_t* result, int base) {
     // check that the base if valid
-    if (base < 2 || base > 36) { *result = '\0'; return result; }
+    if (base < 2 || base > 36) { *result = U'\0'; return result; }
 
     uint32_t* ptr = result, *ptr1 = result, tmp_char;
     int tmp_value;
@@ -42,8 +43,8 @@ uint32_t* itoa32(int value, uint32_t* result, int base) {
     } while ( value );
 
     // Apply negative sign
-    if (tmp_value < 0) *ptr++ = '-';
-    *ptr-- = '\0';
+    if (tmp_value < 0) *ptr++ = U'-';
+    *ptr-- = U'\0';
     while(ptr1 < ptr) {
         tmp_char = *ptr;
         *ptr--= *ptr1;
@@ -51,4 +52,4 @@ uint32_t* itoa32(int value, uint32_t* result, int base) {
     }
     return result;
 }
-*/
+
