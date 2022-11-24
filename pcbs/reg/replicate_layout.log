@@ -1,0 +1,66 @@
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 312:Plugin executed on: 'linux'
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 313:Plugin executed with python version: '3.10.8 (main, Nov  1 2022, 14:18:21) [GCC 12.2.0]'
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 314:KiCad build version: (6.0.9)
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 315:Plugin version: 1.2.2
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 316:Frame repr: <wx._core.Frame object at 0x7f4320b017e0>
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 340:Preparing replicator with U4 as a reference
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.replicate_layout 106:getting a list of all footprints on board
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 364:source anchor footprint is 'U4'
+Located on: ['8bit-2']
+With filenames: ['8bit.kicad_sch']
+With sheet_id:['8bit-2']
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 371:Corresponding footprints are 
+[('U8', ['8bit-4']), ('U6', ['8bit-3']), ('U4', ['8bit-2']), ('U2', ['8bit-1'])]
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 383:Showing dialog
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.replicate_layout 344:constructing a list of sheets suitable for replication on level:'8bit-2', file:'8bit.kicad_sch'
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.replicate_layout 381:suitable sheets are:[['8bit-1'], ['8bit-3'], ['8bit-4']]
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.replicate_layout 1112:Level selected: ['8bit-2']
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 389:Toolbar position: wx.Point(4002, 678)
+11-22 20:54:09 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 395:Dialog position: wx.Point(3638, 678)
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 344:constructing a list of sheets suitable for replication on level:'8bit-2', file:'8bit.kicad_sch'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 381:suitable sheets are:[['8bit-1'], ['8bit-3'], ['8bit-4']]
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 170:Replicating layout
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 154:Starting replication of sheets: [['8bit-1'], ['8bit-3'], ['8bit-4']]
+on level: ['8bit-2']
+with tracks=True, zone=True, text=True, text=True, containing=True, remove=False, locked footprints=False, by_group=False
+11-22 20:54:26 root 252:updating GUI message: 'Preparing for replication'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 224:Getting the list of source footprints
+11-22 20:54:26 root 257:updating GUI with: 0
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 239:Getting the list of all the remaining footprints
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 244:Getting nets local to source footprints
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 247:Getting source bounding box
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 251:Getting source tracks
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 266:Getting source zones
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 275:Getting source text items
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 284:Getting source drawing items
+11-22 20:54:26 root 252:updating GUI message: 'Replicating footprints'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 678:Replicating footprints
+11-22 20:54:26 root 257:updating GUI with: 0
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 684:Replicating footprints on sheet ['8bit-1']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 684:Replicating footprints on sheet ['8bit-3']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 684:Replicating footprints on sheet ['8bit-4']
+11-22 20:54:26 root 252:updating GUI message: 'Replicating tracks'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 844:Replicating tracks
+11-22 20:54:26 root 257:updating GUI with: 0
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 850:Replicating tracks on sheet ['8bit-1']
+11-22 20:54:26 root 257:updating GUI with: 0
+11-22 20:54:26 root 257:updating GUI with: 0
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 850:Replicating tracks on sheet ['8bit-3']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 850:Replicating tracks on sheet ['8bit-4']
+11-22 20:54:26 root 252:updating GUI message: 'Replicating zones'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 909:Replicating zones
+11-22 20:54:26 root 257:updating GUI with: 0
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 916:Replicating zones on sheet ['8bit-1']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 916:Replicating zones on sheet ['8bit-3']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 916:Replicating zones on sheet ['8bit-4']
+11-22 20:54:26 root 252:updating GUI message: 'Replicating text'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 985:Replicating text
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 992:Replicating text on sheet ['8bit-1']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 992:Replicating text on sheet ['8bit-3']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 992:Replicating text on sheet ['8bit-4']
+11-22 20:54:26 root 252:updating GUI message: 'Replicating drawings'
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 1032:Replicating drawings
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 1038:Replicating drawings on sheet ['8bit-1']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 1038:Replicating drawings on sheet ['8bit-3']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.replicate_layout 1038:Replicating drawings on sheet ['8bit-4']
+11-22 20:54:26 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 190:Replication complete
