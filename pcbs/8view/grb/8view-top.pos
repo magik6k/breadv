@@ -1,0 +1,46 @@
+### Module positions - created on Thu 24 Nov 2022 04:01:39 PM CET ###
+### Printed by Pcbnew version (6.0.9)
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val                Package                                         PosX       PosY       Rot  Side
+D1        LED                LED_0603_1608Metric                         138.4300  -146.5580   90.0000  top
+D2        LED                LED_0603_1608Metric                         140.9700  -146.5580   90.0000  top
+D3        LED                LED_0603_1608Metric                         143.5100  -146.5580   90.0000  top
+D4        LED                LED_0603_1608Metric                         146.0500  -146.5580   90.0000  top
+D5        LED                LED_0603_1608Metric                         148.5900  -146.5580   90.0000  top
+D6        LED                LED_0603_1608Metric                         151.1300  -146.5580   90.0000  top
+D7        LED                LED_0603_1608Metric                         153.6700  -146.5580   90.0000  top
+D8        LED                LED_0603_1608Metric                         156.2100  -146.5580   90.0000  top
+J1        Conn_01x10_Female  PinHeader_1x08_P2.54mm_Horizontal           138.4300  -118.3640   90.0000  top
+J2        Conn_01x10_Female  PinHeader_1x08_P2.54mm_Horizontal           156.1950  -150.8190  -90.0000  top
+J3        Conn_01x06_Female  Molex-54550-0671-Manufacturer_Recommended   155.2600  -140.1770   90.0000  top
+J4        Conn_01x06_Female  Molex-54550-0671-Manufacturer_Recommended   139.6340  -140.2080  -90.0000  top
+R1        1000               R_0402_1005Metric                           137.1000  -147.0400   90.0000  top
+R2        1000               R_0402_1005Metric                           139.6400  -147.0380   90.0000  top
+R3        1000               R_0402_1005Metric                           142.1800  -147.0400   90.0000  top
+R4        1000               R_0402_1005Metric                           144.7200  -147.0400   90.0000  top
+R5        1000               R_0402_1005Metric                           147.2600  -147.0400   90.0000  top
+R6        1000               R_0402_1005Metric                           149.8000  -147.0400   90.0000  top
+R7        1000               R_0402_1005Metric                           152.3400  -147.0380   90.0000  top
+R8        1000               R_0402_1005Metric                           154.8800  -147.0400   90.0000  top
+R9        1000               R_0402_1005Metric                           140.9680  -134.8740  180.0000  top
+R10       1000               R_0402_1005Metric                           137.6680  -124.9680   90.0000  top
+R11       1000               R_0402_1005Metric                           137.6680  -127.5080   90.0000  top
+R12       1000               R_0402_1005Metric                           137.6680  -130.0480   90.0000  top
+R13       1000               R_0402_1005Metric                           138.6840  -132.8420   90.0000  top
+R14       1000               R_0402_1005Metric                           138.6840  -130.0480   90.0000  top
+R15       1000               R_0402_1005Metric                           138.6840  -124.9680   90.0000  top
+R16       1000               R_0402_1005Metric                           138.6840  -127.5080   90.0000  top
+R17       1000               R_0402_1005Metric                           137.6680  -132.8420   90.0000  top
+R18       1000               R_0402_1005Metric                           157.4800  -124.7140   90.0000  top
+R19       1000               R_0402_1005Metric                           156.4640  -124.7140   90.0000  top
+R20       1000               R_0402_1005Metric                           156.4640  -127.2540   90.0000  top
+R21       1000               R_0402_1005Metric                           156.4640  -132.3340   90.0000  top
+R22       1000               R_0402_1005Metric                           157.4800  -132.3340   90.0000  top
+R23       1000               R_0402_1005Metric                           157.4800  -127.2540   90.0000  top
+R24       1000               R_0402_1005Metric                           157.4800  -129.7940   90.0000  top
+R25       1000               R_0402_1005Metric                           156.4640  -129.7940   90.0000  top
+U1        ATtiny828-A        TQFP-32_7x7mm_P0.8mm                        147.5740  -139.4460   90.0000  top
+U2        HDSP-A151          HDSP-A151                                   140.7885  -122.1740    0.0000  top
+U3        HDSP-A151          HDSP-A151                                   149.0980  -122.1740    0.0000  top
+## End

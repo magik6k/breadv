@@ -1,0 +1,4 @@
+Ref,Val,Package,PosX,PosY,Rot,Side
+"C1","C","C_0603_1608Metric",36.830000,-31.496000,90.000000,top
+"J1","Conn_01x06_Female","Molex-54550-0671-Manufacturer_Recommended",49.452000,-31.466001,90.000000,top
+"J2","Conn_02x03_Counter_Clockwise","PinHeader_2x03_P2.54mm_Vertical",43.942000,-34.006000,180.000000,top

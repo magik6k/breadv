@@ -33,9 +33,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.0,
-          "height": 3.1,
-          "width": 2.3
+          "drill": 0.762,
+          "height": 1.524,
+          "width": 1.524
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -55,9 +55,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        "silk_over_copper|144780000|116840000|90c6cfef-3428-4f46-9361-21599624233a|8c90fa57-4f18-4808-a816-657f25eccc91"
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -87,8 +85,8 @@
         "padstack": "error",
         "pth_inside_courtyard": "ignore",
         "shorting_items": "error",
-        "silk_over_copper": "ignore",
-        "silk_overlap": "ignore",
+        "silk_over_copper": "warning",
+        "silk_overlap": "warning",
         "skew_out_of_range": "error",
         "through_hole_pad_without_hole": "error",
         "too_many_vias": "error",
@@ -107,7 +105,7 @@
         "max_error": 0.005,
         "min_clearance": 0.0,
         "min_copper_edge_clearance": 0.0,
-        "min_hole_clearance": 0.175,
+        "min_hole_clearance": 0.25,
         "min_hole_to_hole": 0.25,
         "min_microvia_diameter": 0.19999999999999998,
         "min_microvia_drill": 0.09999999999999999,
@@ -122,7 +120,7 @@
       },
       "track_widths": [
         0.0,
-        0.175
+        0.3
       ],
       "via_dimensions": [
         {
@@ -349,7 +347,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "8view.kicad_pro",
+    "filename": "8view-out.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -428,7 +426,7 @@
   },
   "sheets": [
     [
-      "4c29280b-c17b-4cce-b4a3-5f7e396ef3dd",
+      "ba49182e-0b87-4f98-b241-b2236db90b5e",
       ""
     ]
   ],
