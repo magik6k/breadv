@@ -249,6 +249,17 @@ func main() {
 			return
 		}
 
+		var base int64
+		bstr := req.FormValue("base")
+		if bstr != "" {
+			var err error
+			base, err = strconv.ParseInt(bstr, 0, 32)
+			if err != nil {
+				http.Error(resp, "parsing base", http.StatusUnprocessableEntity)
+				return
+			}
+		}
+
 		// data -> []addr
 		instrs := map[int32][]int32{}
 		for i := 0; i < len(toSend); i += 4 {
@@ -261,7 +272,7 @@ func main() {
 			n <<= 8
 			n |= int32(toSend[i+0])
 
-			instrs[n] = append(instrs[n], int32(i))
+			instrs[n] = append(instrs[n], int32(i)+int32(base))
 		}
 
 		// set addr to 0
