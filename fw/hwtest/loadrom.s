@@ -41,7 +41,7 @@ loader:
     or x4, x5, x4
 
     # save word
-    sw x4, 0x400(x3)
+    sw x4, 0x0(x3)
 
     # inc counters
     addi x1, x1, 0x10
