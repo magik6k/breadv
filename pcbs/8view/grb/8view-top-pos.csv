@@ -8,7 +8,7 @@ Ref,Val,Package,PosX,PosY,Rot,Side
 "D7","LED","LED_0603_1608Metric",153.670000,-146.558000,90.000000,top
 "D8","LED","LED_0603_1608Metric",156.210000,-146.558000,90.000000,top
 "J1","Conn_01x10_Female","PinHeader_1x08_P2.54mm_Horizontal",138.430000,-118.364000,90.000000,top
-"J2","Conn_01x10_Female","PinHeader_1x08_P2.54mm_Horizontal",156.195000,-150.819000,-90.000000,top
+"J2","Conn_01x10_Female","PinHeader_1x10_P2.54mm_Horizontal",158.750000,-150.876000,-90.000000,top
 "J3","Conn_01x06_Female","Molex-54550-0671-Manufacturer_Recommended",155.260002,-140.176999,90.000000,top
 "J4","Conn_01x06_Female","Molex-54550-0671-Manufacturer_Recommended",139.633998,-140.208000,-90.000000,top
 "R1","1000","R_0402_1005Metric",137.100000,-147.040000,90.000000,top
