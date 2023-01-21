@@ -44,3 +44,5 @@ function lhu() { ./exec_one.sh "lhu $(echo $@)"; ./exec_one.sh "nop"; ./exec_one
 function lbu() { ./exec_one.sh "lbu $(echo $@)"; ./exec_one.sh "nop"; ./exec_one.sh "nop"; ./exec_one.sh "nop"; }
 
 function li() { ./exec_one.sh "li $(echo $@)"; }
+
+function jalr() { ./exec_one.sh "jalr $(echo $@)"; }

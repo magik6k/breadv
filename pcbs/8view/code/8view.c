@@ -1,6 +1,18 @@
 #include<avr/io.h>
 #include<avr/wdt.h>
 
+#define INVERTED 1
+
+/*
+
+*A*
+F*B
+*G*
+E*C
+*D* DP
+
+*/
+
 #define D1_l1 (1<<PA0)
 #define D1_l6 (1<<PA1)
 #define D1_l2 (1<<PA2)
@@ -19,23 +31,61 @@
 #define D2_l1 (1<<PB6)
 #define D2_l2 (1<<PB7)
 
-#define D1_A D1_l1
-#define D1_B D1_l2
-#define D1_C D1_l3
-#define D1_D D1_l4
-#define D1_E D1_l5
-#define D1_F D1_l6
-#define D1_G D1_l7
-#define D1_DP D1_l8
+#define D1_real_A D1_l1
+#define D1_real_B D1_l2
+#define D1_real_C D1_l3
+#define D1_real_D D1_l4
+#define D1_real_E D1_l5
+#define D1_real_F D1_l6
+#define D1_real_G D1_l7
+#define D1_real_DP D1_l8
 
-#define D2_A D2_l1
-#define D2_B D2_l2
-#define D2_C D2_l3
-#define D2_D D2_l4
-#define D2_E D2_l5
-#define D2_F D2_l6
-#define D2_G D2_l7
-#define D2_DP D2_l8
+#define D2_real_A D2_l1
+#define D2_real_B D2_l2
+#define D2_real_C D2_l3
+#define D2_real_D D2_l4
+#define D2_real_E D2_l5
+#define D2_real_F D2_l6
+#define D2_real_G D2_l7
+#define D2_real_DP D2_l8
+
+#if INVERTED
+#define D1_A D1_real_D
+#define D1_B D1_real_E
+#define D1_C D1_real_F
+#define D1_D D1_real_A
+#define D1_E D1_real_B
+#define D1_F D1_real_C
+#define D1_G D1_real_G
+#define D1_DP D1_real_DP
+
+#define D2_A D2_real_D
+#define D2_B D2_real_E
+#define D2_C D2_real_F
+#define D2_D D2_real_A
+#define D2_E D2_real_B
+#define D2_F D2_real_C
+#define D2_G D2_real_G
+#define D2_DP D2_real_DP
+#else
+#define D1_A D1_real_A
+#define D1_B D1_real_B
+#define D1_C D1_real_C
+#define D1_D D1_real_D
+#define D1_E D1_real_E
+#define D1_F D1_real_F
+#define D1_G D1_real_G
+#define D1_DP D1_real_DP
+
+#define D2_A D2_real_A
+#define D2_B D2_real_B
+#define D2_C D2_real_C
+#define D2_D D2_real_D
+#define D2_E D2_real_E
+#define D2_F D2_real_F
+#define D2_G D2_real_G
+#define D2_DP D2_real_DP
+#endif
 
 #define D1_c1 D1_B|D1_C|0
 #define D1_c2 D1_A|D1_B|D1_D|D1_E|D1_G|0
@@ -111,23 +161,65 @@
 #define D2_cY D2_B|D2_C|D2_D|D2_F|D2_G|0
 #define D2_cZ D2_A|D2_B|D2_D|D2_E|0
 
+#if INVERTED
+
 const uint8_t d1lut[] = {
-    D1_c0,
-    D1_c1,
-    D1_c2,
-    D1_c3,
-    D1_c4,
-    D1_c5,
-    D1_c6,
-    D1_c7,
-    D1_c8,
-    D1_c9,
-    D1_cA,
-    D1_cB,
-    D1_cC,
-    D1_cD,
-    D1_cE,
-    D1_cF
+    D1_c0, // 0000
+    D1_c8, // 0001
+    D1_c4, // 0010
+    D1_cC, // 0011
+    D1_c2, // 0100
+    D1_cA, // 0101
+    D1_c6, // 0110
+    D1_cE, // 0111
+    D1_c1, // 1000
+    D1_c9, // 1001
+    D1_c5, // 1010
+    D1_cD, // 1011
+    D1_c3, // 1100
+    D1_cB, // 1101
+    D1_c7, // 1110
+    D1_cF //  1111
+};
+
+const uint8_t d2lut[] = {
+    D2_c0,
+    D2_c8,
+    D2_c4,
+    D2_cC,
+    D2_c2,
+    D2_cA,
+    D2_c6,
+    D2_cE,
+    D2_c1,
+    D2_c9,
+    D2_c5,
+    D2_cD,
+    D2_c3,
+    D2_cB,
+    D2_c7,
+    D2_cF
+};
+
+#else
+
+const uint8_t d1lut[] = {
+    D1_c0, // 0000
+    D1_c1, // 0001
+    D1_c2, // 0010
+    D1_c3, // 0011
+    D1_c4, // 0100
+    D1_c5, // 0101
+    D1_c6, // 0110
+    D1_c7, // 0111
+    D1_c8, // 1000
+    D1_c9, // 1001
+    D1_cA, // 1010
+    D1_cB, // 1011
+    D1_cC, // 1100
+    D1_cD, // 1101
+    D1_cE, // 1110
+    D1_cF //  1111
 };
 
 const uint8_t d2lut[] = {
@@ -148,6 +240,8 @@ const uint8_t d2lut[] = {
     D2_cE,
     D2_cF
 };
+
+#endif
 
 // <riscv instruction mode>
 
@@ -234,8 +328,13 @@ void main() {
 
             instr |= getbit(val, 0, 7);
 
+            #if INVERTED
             PORTA = ~d1lut[(instr >> 4) & 0xf];
             PORTB = ~d2lut[instr & 0xf];
+            #else
+            PORTA = ~d1lut[(instr >> 4) & 0xf];
+            PORTB = ~d2lut[instr & 0xf];
+            #endif
 
     }
 }
