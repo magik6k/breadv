@@ -1,7 +1,9 @@
 #include<avr/io.h>
 #include<avr/wdt.h>
 
-#define INVERTED 1
+#define INVERTED 0 // output upside down
+
+#define FILPPED 1 // displays upside down
 
 /*
 
@@ -31,6 +33,25 @@ E*C
 #define D2_l1 (1<<PB6)
 #define D2_l2 (1<<PB7)
 
+#if FILPPED
+#define D1_real_A D1_l4
+#define D1_real_B D1_l5
+#define D1_real_C D1_l7
+#define D1_real_D D1_l1
+#define D1_real_E D1_l2
+#define D1_real_F D1_l8
+#define D1_real_G D1_l3
+#define D1_real_DP D1_l6
+
+#define D2_real_A D2_l4
+#define D2_real_B D2_l5
+#define D2_real_C D2_l7
+#define D2_real_D D2_l1
+#define D2_real_E D2_l2
+#define D2_real_F D2_l8
+#define D2_real_G D2_l3
+#define D2_real_DP D2_l6
+#else
 #define D1_real_A D1_l1
 #define D1_real_B D1_l2
 #define D1_real_C D1_l3
@@ -48,6 +69,7 @@ E*C
 #define D2_real_F D2_l6
 #define D2_real_G D2_l7
 #define D2_real_DP D2_l8
+#endif
 
 #if INVERTED
 #define D1_A D1_real_D
