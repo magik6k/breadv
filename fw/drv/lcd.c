@@ -64,7 +64,7 @@ void lcd_init() {
 
 }
 
-void lcd_puts(const uint32_t* s) {
+void lcd_puts(const char* s) {
     for(int i=0;s[i]!='\0';s++) {
         send_byte(s[i], CHR);
     }
