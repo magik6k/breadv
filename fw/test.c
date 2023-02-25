@@ -19,6 +19,8 @@ int main(void) {
         itoa(420, buf, 10);
         lcd_puts(buf);
 
+        while(1){}
+
         return 0;
 }
 

@@ -1,4 +1,4 @@
-volatile unsigned char ex_temp[8];
+unsigned volatile char ex_temp[8];
 volatile bool run_temp = false;
 volatile bool toggle_handoff = false;
 volatile bool in_handoff = false;
@@ -165,9 +165,11 @@ void loop() {
         ex_temp[2] = ex_temp[6];
         ex_temp[3] = ex_temp[7];
         toggle_handoff = sb == 'Y';
+        digitalWrite(LED_BUILTIN, 1);
         run_temp = true;
 
-        while(run_temp || toggle_handoff);
+        while(run_temp || toggle_handoff) digitalWrite(LED_BUILTIN, run_temp);
+        digitalWrite(LED_BUILTIN, run_temp);
         Serial.write('D'); // exec ack
 
         if(sb == 'Y') {
@@ -251,7 +253,7 @@ void loop() {
 void clk() {
   bool pin = digitalRead(clock_pin);
   if(!pin) {
-    return;
+    return; // only when going high
   }
 
   if(in_handoff) {
@@ -283,8 +285,8 @@ void clk() {
 
   if(run_temp) {
     putTemp();
-    digitalWrite(LED_BUILTIN, 1);
     run_temp = false;
+    //digitalWrite(LED_BUILTIN, 0);
     return;
   }
   if(toggle_handoff) {
@@ -294,6 +296,5 @@ void clk() {
   }
 
   putNop();
-  digitalWrite(LED_BUILTIN, 0);
 }
 
