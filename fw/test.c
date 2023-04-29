@@ -5,21 +5,40 @@
 void lcd_init();
 void lcd_puts(const char* s);
 
-volatile int x;
-volatile int y;
+int uart_read_ready(void);
+char uart_read_async(void);
+char uart_read(void);
+
+void lcd_shift_disp();
+void lcd_shift_cur();
 
 char* itoa(int value, char* result, int base);
 
 int main(void) {
         lcd_init();
 
-        char buf[20] = "prints";
+        char buf[2] = ">";
 
         lcd_puts(buf);
-        itoa(420, buf, 10);
-        lcd_puts(buf);
+        //itoa(420, buf, 10);
+        //lcd_puts(buf);
 
-        while(1){}
+        while(1){
+                char c = uart_read();
+
+                switch(c) {
+                case 'a':
+                    lcd_shift_disp();
+                    break;
+                case 'b':
+                    lcd_shift_cur();
+                    break;
+                default:
+                    buf[0] = c;
+                    buf[1] = '\0';
+                    lcd_puts(buf);
+                }
+        }
 
         return 0;
 }

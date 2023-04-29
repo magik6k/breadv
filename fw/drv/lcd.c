@@ -61,7 +61,14 @@ void lcd_init() {
     //send_byte(LCDC_ENTRY_MODE | LCD_EM_SHIFT_CURSOR | LCD_EM_RIGHT, CMD);
 
 //    send_byte('B', CHR);
+}
 
+void lcd_shift_disp() {
+    send_byte(LCD_SHIFT | LCDC_SHIFT_DISP, CMD);
+}
+
+void lcd_shift_cur() {
+    send_byte(LCD_SHIFT | LCDC_SHIFT_CURSOR, CMD);
 }
 
 void lcd_puts(const char* s) {

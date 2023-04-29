@@ -1,9 +1,9 @@
 #include<avr/io.h>
 #include<avr/wdt.h>
 
-#define INVERTED 0 // output upside down
+#define INVERTED 1 // output upside down
 
-#define FILPPED 1 // displays upside down
+#define FILPPED 0 // displays upside down
 
 /*
 
