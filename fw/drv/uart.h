@@ -1,6 +1,8 @@
 
 
-#define UART_BASE 0x00200000 // temp hardware
+//#define UART_BASE 0x00200000 // temp hardware
+
+#define UART_BASE 0x1ffffff8
 
 #define UART_RXB (0x00)
 #define UART_LSR (0x04)

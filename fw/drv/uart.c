@@ -9,7 +9,7 @@ int uart_read_ready(void) {
 }
 
 char uart_read_async(void) {
-    return ReadRegsssrrr(UART_RXB);
+    return ReadReg(UART_RXB);
 }
 
 char uart_read(void) {
